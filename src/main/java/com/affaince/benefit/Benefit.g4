@@ -4,20 +4,16 @@ grammar Benefit;
 package com.affaince.benefit;
 }
 scheme
-    : givenStatement  computeStatement    eligibilityStatement    payStatement
+    : givenStatement  computeStatement    eligibilityStatement    payStatement  EOF
     ;
 
-/*
-inputOrAssignmentOnly
-    :   inputExpression |   assignmentExpression
-    ;
-*/
+
 givenStatement
-    :   GivenOperator  ((inputExpression |   assignmentExpression) SemiColonOperator) +
+    :   GivenOperator  ((inputExpression |   assignmentExpression) SemiColonOperator)+
     ;
 
 computeStatement
-    :   ComputeOperator (assignmentExpression SemiColonOperator) +
+    :   ComputeOperator (assignmentExpression SemiColonOperator)+
     ;
 
 
@@ -26,12 +22,7 @@ eligibilityStatement
    ;
 
 payStatement
-   :    PayOperator
-        IDENTIFIER
-        (BeforeOperator | AfterOperator)
-        expressionList OfOperator
-        IDENTIFIER
-        (proportionExpression) SemiColonOperator
+   :    PayOperator IDENTIFIER (BeforeOperator | AfterOperator) expressionList OfOperator IDENTIFIER proportionExpression SemiColonOperator
    ;
 inputExpression
     :  (IDENTIFIER | array) AsInputOperator
@@ -65,7 +56,7 @@ array
 
 
 expressionList
-    :   expression (CommaOperator expression)*    #multipleExpressionsInList
+    :   expression (CommaOperator expression)*     #multipleExpressionsInList
     ;
 
 expression
@@ -75,22 +66,8 @@ expression
     |   inputExpression
     |   loopExpression
     |   aggregateSumExpression
-    |   primary
+    |   (IDENTIFIER | NUMBER |StringLiteral | BooleanLiteral |NullLiteral |array )
     ;
-
-primary
-    :   LParanOperator expression RParanOperator
-    |   NUMBER
-    |   StringLiteral
-    |   BooleanLiteral
-    |   NullLiteral
-    |   IDENTIFIER
-    |   array
-    ;
-
-
-
-
 
 //end of expressions
 
@@ -215,58 +192,58 @@ NUMBER
 
 //arithmatic /functional operators with/without spaces
 AsInputOperator
-    :  ANY_SPACE ASINPUT ANY_SPACE | ANY_SPACE ASINPUT | ASINPUT ANY_SPACE
+    :  ASINPUT| ANY_SPACE ASINPUT ANY_SPACE | ANY_SPACE ASINPUT | ASINPUT ANY_SPACE
     ;
 ArithmaticOperatorModMultDiv
-    :   ANY_SPACE (MOD|MUL|DIV) ANY_SPACE | ANY_SPACE (MOD|MUL|DIV) | (MOD|MUL|DIV) ANY_SPACE
+    :   (MOD|MUL|DIV) | ANY_SPACE (MOD|MUL|DIV) ANY_SPACE | ANY_SPACE (MOD|MUL|DIV) | (MOD|MUL|DIV) ANY_SPACE
     ;
 ArithmaticOperatorAddSubtract
-    :   ANY_SPACE (ADD | SUB) ANY_SPACE | ANY_SPACE (ADD | SUB) | (ADD | SUB) ANY_SPACE
+    :   (ADD | SUB) |   ANY_SPACE (ADD | SUB) ANY_SPACE | ANY_SPACE (ADD | SUB) | (ADD | SUB) ANY_SPACE
     ;
 ArithmaticOperatorAssignment
-    :   ANY_SPACE ASSIGN ANY_SPACE | ANY_SPACE ASSIGN | ASSIGN ANY_SPACE
+    :   ASSIGN | ANY_SPACE ASSIGN ANY_SPACE | ANY_SPACE ASSIGN | ASSIGN ANY_SPACE
     ;
 ArithmaticOperatorLT
-    :   ANY_SPACE LT ANY_SPACE | ANY_SPACE LT | LT ANY_SPACE
+    :   LT | ANY_SPACE LT ANY_SPACE | ANY_SPACE LT | LT ANY_SPACE
     ;
 
 ArithmaticOperatorLE
-    :   ANY_SPACE LE ANY_SPACE | ANY_SPACE LE | LE ANY_SPACE
+    :   LE | ANY_SPACE LE ANY_SPACE | ANY_SPACE LE | LE ANY_SPACE
     ;
 
 ArithmaticOperatorGT
-    :   ANY_SPACE GT ANY_SPACE | ANY_SPACE GT | GT ANY_SPACE
+    :   GT | ANY_SPACE GT ANY_SPACE | ANY_SPACE GT | GT ANY_SPACE
     ;
 
 ArithmaticOperatorGE
-    :   ANY_SPACE GE ANY_SPACE | ANY_SPACE GE | GE ANY_SPACE
+    :   GE  | ANY_SPACE GE ANY_SPACE | ANY_SPACE GE | GE ANY_SPACE
     ;
 ArithmaticOperatorEQUAL
-    :   ANY_SPACE EQUAL ANY_SPACE | ANY_SPACE EQUAL | EQUAL ANY_SPACE
+    :   EQUAL | ANY_SPACE EQUAL ANY_SPACE | ANY_SPACE EQUAL | EQUAL ANY_SPACE
     ;
 ArithmaticOperatorNOTEQUAL
-    :   ANY_SPACE NOTEQUAL ANY_SPACE | ANY_SPACE NOTEQUAL | NOTEQUAL ANY_SPACE
+    :   NOTEQUAL |  ANY_SPACE NOTEQUAL ANY_SPACE | ANY_SPACE NOTEQUAL | NOTEQUAL ANY_SPACE
     ;
 LParanOperator
-    :   ANY_SPACE LPAREN ANY_SPACE | ANY_SPACE LPAREN | LPAREN  ANY_SPACE
+    :   LPAREN  | ANY_SPACE LPAREN ANY_SPACE | ANY_SPACE LPAREN | LPAREN  ANY_SPACE
     ;
 RParanOperator
-    :   ANY_SPACE RPAREN ANY_SPACE | ANY_SPACE RPAREN | RPAREN   ANY_SPACE
+    :   RPAREN | ANY_SPACE RPAREN ANY_SPACE | ANY_SPACE RPAREN | RPAREN   ANY_SPACE
     ;
 LBrackOperator
-    :   ANY_SPACE LBRACK ANY_SPACE | ANY_SPACE LBRACK | LBRACK ANY_SPACE
+    :   LBRACK | ANY_SPACE LBRACK ANY_SPACE | ANY_SPACE LBRACK | LBRACK ANY_SPACE
     ;
 RBrackOperator
-    :   ANY_SPACE RBRACK ANY_SPACE | ANY_SPACE RBRACK | RBRACK ANY_SPACE
+    :   RBRACK | ANY_SPACE RBRACK ANY_SPACE | ANY_SPACE RBRACK | RBRACK ANY_SPACE
     ;
 SemiColonOperator
-    :   ANY_SPACE SEMI ANY_SPACE | ANY_SPACE SEMI | SEMI ANY_SPACE
+    :   SEMI | ANY_SPACE SEMI ANY_SPACE | ANY_SPACE SEMI | SEMI ANY_SPACE
     ;
 ColonOperator
     :   ANY_SPACE COLON ANY_SPACE | ANY_SPACE COLON | COLON ANY_SPACE
     ;
 CommaOperator
-    :   ANY_SPACE COMMA ANY_SPACE | ANY_SPACE COMMA | COMMA ANY_SPACE
+    :   COMMA | ANY_SPACE COMMA ANY_SPACE | ANY_SPACE COMMA | COMMA ANY_SPACE
     ;
 GivenOperator
     :    ANY_SPACE GIVEN ANY_SPACE | ANY_SPACE GIVEN | GIVEN ANY_SPACE
