@@ -7,26 +7,29 @@ scheme
     : givenStatement  computeStatement    eligibilityStatement    payStatement
     ;
 
+/*
 inputOrAssignmentOnly
     :   inputExpression |   assignmentExpression
     ;
+*/
 givenStatement
-    :   GivenOperator (inputOrAssignmentOnly SemiColonOperator)+
+    :   GivenOperator  ((inputExpression |   assignmentExpression) SemiColonOperator) +
     ;
 
 computeStatement
-    :   ComputeOperator assignmentExpression (SemiColonOperator assignmentExpression)+
+    :   ComputeOperator (assignmentExpression SemiColonOperator) +
     ;
 
 
 eligibilityStatement
-   :    EligibleWhenOperator comparisonExpression (SemiColonOperator | (combiningExpression comparisonExpression)+)
+   :    EligibleWhenOperator combiningExpression SemiColonOperator
    ;
 
 payStatement
    :    PayOperator
+        IDENTIFIER
         (BeforeOperator | AfterOperator)
-        (expression (CommaOperator expression)*  OfOperator)
+        expressionList OfOperator
         IDENTIFIER
         (proportionExpression) SemiColonOperator
    ;
@@ -38,10 +41,13 @@ comparisonExpression
     ;
 
 combiningExpression
-    :    comparisonExpression (AndOperator | OrOperator) comparisonExpression
+    :    comparisonExpression ((AndOperator | OrOperator) comparisonExpression)*
+    ;
+nonDefaultProportionExpression
+    :    NUMBER ColonOperator NUMBER (ColonOperator NUMBER)+
     ;
 proportionExpression
-    :   InOperator  DefaultOperator | (NUMBER ColonOperator NUMBER (ColonOperator NUMBER)+)  ProprotionOperator
+    :   InOperator  (DefaultOperator | nonDefaultProportionExpression)   ProprotionOperator
     ;
 assignmentExpression
     :   IDENTIFIER  ArithmaticOperatorAssignment  expression
@@ -59,24 +65,28 @@ array
 
 
 expressionList
-    :   expression      #singleExpresionInList
-    |   expression (CommaOperator expression)*     #multipleExpressionsInList
+    :   expression (CommaOperator expression)*    #multipleExpressionsInList
     ;
 
 expression
     :   expression ArithmaticOperatorModMultDiv expression
     |   expression ArithmaticOperatorAddSubtract expression
-    |   (NUMBER | StringLiteral | BooleanLiteral | NullLiteral)
-    |   IDENTIFIER
-    |   array
-    |   comparisonExpression
     |   assignmentExpression
     |   inputExpression
-    |   LParanOperator expression RParanOperator
     |   loopExpression
     |   aggregateSumExpression
+    |   primary
     ;
 
+primary
+    :   LParanOperator expression RParanOperator
+    |   NUMBER
+    |   StringLiteral
+    |   BooleanLiteral
+    |   NullLiteral
+    |   IDENTIFIER
+    |   array
+    ;
 
 
 
@@ -90,8 +100,6 @@ expression
 
 
 
-NUMBER
-    :   Sign? ('.' [0-9]+ | [0-9]+ ('.' [0-9]*)? ) ;
 
 GIVEN
     :   'given'
@@ -140,7 +148,6 @@ ANDSTR
 ORSTR
     :   'or'
     ;
-
 
 fragment
 Sign
@@ -201,6 +208,9 @@ DIV : '/';
 MOD : '%';
 ANY_SPACE	:	SINGLE_SPACE+ ;
 SINGLE_SPACE	:	' ';
+NUMBER
+    :   Sign? ('.' [0-9]+ | [0-9]+ ('.' [0-9]*)? ) ;
+
 
 
 //arithmatic /functional operators with/without spaces
