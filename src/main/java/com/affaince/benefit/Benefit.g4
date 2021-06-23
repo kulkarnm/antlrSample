@@ -19,8 +19,7 @@ givenBody
     :   givenBlock+
     ;
 givenBlock
-    :   inputVariableDeclarationStatement
-    |   variableDeclarationStatement
+    :   variableDeclarationStatement
     ;
 
 
@@ -28,15 +27,13 @@ computeUnit
     :   COMPUTE computeBlock
     ;
 
-
-
 computeBlock
     :   block+
     ;
 
 
 eligibilityUnit
-   :    ELIGIBLEWHEN combiningExpression SEMI
+   :    ELIGIBLEWHEN block SEMI
    ;
 
 payUnit
@@ -44,11 +41,11 @@ payUnit
    ;
 
 
-inputVariableDeclarationStatement
-    :  variableDeclaratorId ASINPUT SEMI
-    ;
 variableDeclarationStatement
-    :   variableDeclaratorId '=' variableInitializer SEMI
+    :   variableDeclaratorId
+    |   variableDeclaratorId ASSIGN variableInitializer SEMI
+    |   variableDeclaratorId ASINPUT SEMI
+    |   variableDeclaratorId ASSIGN statement
     ;
 variableDeclaratorId
     :   IDENTIFIER ('[' ']')*
@@ -80,7 +77,9 @@ relationalOp
     ;
 relationalExpression
     :   additiveExpression ( relationalOp additiveExpression )*
+    |   iterativeStatement ( relationalOp additiveExpression )*
     ;
+
 additiveExpression
     :   multiplicativeExpression ( (ADD | SUB) multiplicativeExpression )*
     ;
@@ -94,19 +93,18 @@ unaryExpression
     |   '-' unaryExpression
     |   primary
     ;
+
 primary
     :   parExpression
     |   literal
     |   IDENTIFIER
     ;
+
 parExpression
     :   LPAREN expression RPAREN
     ;
 
 
-combiningExpression
-    :    expression ((ANDSTR | ORSTR) expression)*
-    ;
 nonDefaultProportionExpression
     :    NUMBER COLON NUMBER (COLON NUMBER)+
     ;
@@ -128,10 +126,11 @@ literal
     |   BooleanLiteral
     |   'null'
     ;
-
+iterativeStatement
+    :   (SUMOF)? EACH (variableDeclarationStatement | statement)
+    ;
 statement
-     : EACH variableDeclaratorId SEMI
-     | SUMOF EACH variableDeclaratorId SEMI
+     : iterativeStatement
      | statementExpression
      ;
 
