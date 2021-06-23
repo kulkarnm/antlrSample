@@ -269,6 +269,7 @@ fragment
 SingleCharacter
 	:	~['\\]
 	;
+// §3.10.5 String Literals
 StringLiteral
 	:	'"' StringCharacters? '"'
 	;
@@ -278,7 +279,7 @@ StringCharacters
 	;
 fragment
 StringCharacter
-	:	//~["\\]
+	:	~["\\]
 	|	EscapeSequence
 	;
 // §3.10.6 Escape Sequences for Character and String Literals
