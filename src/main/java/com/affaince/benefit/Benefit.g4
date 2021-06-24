@@ -16,10 +16,7 @@ givenUnit
     ;
 
 givenBody
-    :   givenBlock+
-    ;
-givenBlock
-    :   variableDeclarationStatement
+    :   block
     ;
 
 
@@ -28,12 +25,12 @@ computeUnit
     ;
 
 computeBlock
-    :   block+
+    :   block
     ;
 
 
 eligibilityUnit
-   :    ELIGIBLEWHEN block SEMI
+   :    ELIGIBLEWHEN block
    ;
 
 payUnit
@@ -130,19 +127,20 @@ iterativeStatement
     :   (SUMOF)? EACH (variableDeclarationStatement | statement)
     ;
 statement
-     : iterativeStatement
-     | statementExpression
+     :  block
+     |  statementExpression SEMI
+     |  iterativeStatement
      ;
 
 statementExpression
     :   expression
     ;
 block
-    : blockStatement+
+    :  '{' blockStatement* '}'
     ;
 blockStatement
-    :   variableDeclarationStatement
-    |   statement
+    :   statement
+    |   variableDeclarationStatement
     ;
 
 
