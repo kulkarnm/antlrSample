@@ -19,5 +19,6 @@ public class SchemeFactory {
         });
         p.addParseListener(new BenefitSchemeListener());
         p.scheme();
+        return null;
     }
 }
