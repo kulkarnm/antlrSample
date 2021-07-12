@@ -19,5 +19,6 @@ public enum ArithmeticOperator {
     LOOPEQUALTO,
     NOTEQUALTO,
     LOOPNOTEQUALTO,
-    ASSIGNMENT
+    TERNARY,
+    ASSIGN
 }

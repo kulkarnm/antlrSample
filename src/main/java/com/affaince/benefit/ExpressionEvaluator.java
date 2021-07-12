@@ -1,13 +1,17 @@
 package com.affaince.benefit;
 
+import com.affaince.benefit.scheme.ArithmeticExpression;
+import com.affaince.benefit.scheme.ArithmeticOperator;
 import com.affaince.benefit.scheme.Expression;
 import com.affaince.benefit.scheme.UnaryExpression;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class ExpressionBuilder<L,R,P> {
+
+public class ExpressionEvaluator<L,R,P> {
     public Expression<L,R,P> buildExpression(BenefitParser.ExpressionContext expressionContext){
-        processExpression(expressionContext);
-        return null;
+        return processExpression(expressionContext);
     }
     private Expression<L,R,P> processExpression(BenefitParser.ExpressionContext expressionContext){
         //first check for expression type
@@ -16,6 +20,7 @@ public class ExpressionBuilder<L,R,P> {
             Expression<L,R,P> lhs = processConditionalExpression(expressionContext.conditionalExpression());
             if(null != expressionContext.ASSIGN() && null != expressionContext.expression()){
                 Expression<L,R,P> rhs = processExpression(expressionContext.expression());
+                return  (Expression<L,R,P>) new ArithmeticExpression<>(ArithmeticOperator.ASSIGN,lhs,rhs);
             }
         }
         return null;
@@ -24,10 +29,14 @@ public class ExpressionBuilder<L,R,P> {
     Expression <L,R,P> processConditionalExpression(BenefitParser.ConditionalExpressionContext conditionalExpressionContext) {
         if(null != conditionalExpressionContext.conditionalOrExpression()){
             Expression<L,R,P> lhs = processConditionalOrExpression(conditionalExpressionContext.conditionalOrExpression());
+            Boolean conditionValue = (Boolean) lhs.apply();
             if(null != conditionalExpressionContext.QUESTIONMARK() && null !=conditionalExpressionContext.expression() ){
-                Expression<L,R,P> rhs1 = processExpression(conditionalExpressionContext.expression());
-                if(null != conditionalExpressionContext.COLON() && null!= conditionalExpressionContext.conditionalExpression()){
-                    Expression<L,R,P> rhs2 = processConditionalExpression(conditionalExpressionContext.conditionalExpression());
+                if(conditionValue) {
+                    return processExpression(conditionalExpressionContext.expression());
+                }else {
+                    if (null != conditionalExpressionContext.COLON() && null != conditionalExpressionContext.conditionalExpression()) {
+                        return processConditionalExpression(conditionalExpressionContext.conditionalExpression());
+                    }
                 }
             }
         }
@@ -37,12 +46,20 @@ public class ExpressionBuilder<L,R,P> {
     Expression <L,R,P> processConditionalOrExpression(BenefitParser.ConditionalOrExpressionContext conditionalOrExpressionContext) {
         if(null != conditionalOrExpressionContext.conditionalAndExpression(0)){
             Expression<L,R,P> lhs = processConditionalAndExpression(conditionalOrExpressionContext.conditionalAndExpression(0));
+            Boolean lhsConditionValue = (Boolean)lhs.apply();
+            if(lhsConditionValue){
+                return lhs;
+            }
             if(null != conditionalOrExpressionContext.ORSTR() &&
                     !conditionalOrExpressionContext.ORSTR().isEmpty() &&
                     null != conditionalOrExpressionContext.conditionalAndExpression() &&
                     !conditionalOrExpressionContext.conditionalAndExpression().isEmpty()){
                 for(BenefitParser.ConditionalAndExpressionContext conditionalAndExpressionContext: conditionalOrExpressionContext.conditionalAndExpression()) {
                     Expression<L, R, P> rhs = processConditionalAndExpression(conditionalAndExpressionContext);
+                    Boolean rhsConditionValue = (Boolean)rhs.apply();
+                    if(rhsConditionValue){
+                        return rhs;
+                    }
                 }
             }
         }
@@ -50,16 +67,27 @@ public class ExpressionBuilder<L,R,P> {
     }
 
     Expression<L,R,P> processConditionalAndExpression (BenefitParser.ConditionalAndExpressionContext conditionalAndExpressionContext){
-        if(null!= conditionalAndExpressionContext.relationalExpression(0)){
-            Expression<L,R,P> lhs = processRelationalExpression(conditionalAndExpressionContext.relationalExpression(0));
-            if(null != conditionalAndExpressionContext.ANDSTR() &&
-                    !conditionalAndExpressionContext.ANDSTR().isEmpty() &&
-                    null != conditionalAndExpressionContext.relationalExpression() &&
-                    !conditionalAndExpressionContext.relationalExpression().isEmpty()){
-                for(BenefitParser.RelationalExpressionContext relationalExpressionContext: conditionalAndExpressionContext.relationalExpression()) {
-                    Expression<L, R, P> rhs = processRelationalExpression(relationalExpressionContext);
+        List<Boolean> conditionValuesList = new ArrayList<>();
+        if(null!= conditionalAndExpressionContext.relationalExpression(0)) {
+            Expression<L, R, P> lhs = processRelationalExpression(conditionalAndExpressionContext.relationalExpression(0));
+            Boolean lhsConditionValue = (Boolean) lhs.apply();
+            if (!lhsConditionValue) {
+                return (Expression<L, R, P>) new UnaryExpression<Boolean>(false);
+            } else {
+                if (null != conditionalAndExpressionContext.ANDSTR() &&
+                        !conditionalAndExpressionContext.ANDSTR().isEmpty() &&
+                        null != conditionalAndExpressionContext.relationalExpression() &&
+                        !conditionalAndExpressionContext.relationalExpression().isEmpty()) {
+                    for (BenefitParser.RelationalExpressionContext relationalExpressionContext : conditionalAndExpressionContext.relationalExpression()) {
+                        Expression<L, R, P> rhs = processRelationalExpression(relationalExpressionContext);
+                        Boolean rhsConditionValue =(Boolean) rhs.apply();
+                        if(!rhsConditionValue){
+                            return (Expression<L, R, P>) new UnaryExpression<Boolean>(false);
+                        }
+                    }
                 }
             }
+            return (Expression<L, R, P>) new UnaryExpression<Boolean>(true);
         }
         return null;
     }
