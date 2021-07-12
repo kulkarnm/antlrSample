@@ -1,8 +1,11 @@
 package com.affaince.benefit.scheme;
 
 
-public class VariableExpression<L extends String,R> extends Expression<L,R,R>  {
-    public VariableExpression(L variableName,R variable) {
+import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
+
+public class VariableExpression<String,R extends Expression> extends Expression<String,R,R>  {
+    public VariableExpression(String variableName,R variable) {
         super(null,variableName,variable);
     }
 

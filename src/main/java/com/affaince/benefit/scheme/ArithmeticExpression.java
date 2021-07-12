@@ -1,30 +1,35 @@
 package com.affaince.benefit.scheme;
 
+import com.sun.org.apache.xpath.internal.ExpressionOwner;
+
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.lang.Double;
 
-public class ArithmeticExpression<L extends Expression,R extends Expression ,P extends Number> extends Expression<L,R,P> {
+public class ArithmeticExpression<L extends Expression,R extends Expression ,P extends Expression> extends Expression<L,R,P> {
     public ArithmeticExpression(ArithmeticOperator operator, L leftHandSide, R rightHandSide) {
         super(operator, leftHandSide, rightHandSide);
     }
 
-    protected Number obtainExpressionValueAsNumber(Expression exp){
-        Number lhsValue=null;
+    protected Expression<L, R, P> obtainExpressionValue(Expression exp){
+        Expression<L,R,P> lhsValue=null;
         if(exp instanceof VariableExpression){
-            lhsValue = (Number)((VariableExpression)exp).apply();
+            lhsValue = ((VariableExpression)exp).apply();
+        }else if (exp instanceof UnaryExpression){
+            lhsValue=exp;
         }else{
-            lhsValue = obtainExpressionValueAsNumber((ArithmeticExpression)exp);
+            lhsValue = obtainExpressionValue((ArithmeticExpression)exp);
         }
         return lhsValue;
     }
-    private Number executeBiFunction(BiFunction<Number,Number,Number> biFunction){
-        Number lValue = obtainExpressionValueAsNumber(getLeftHandSide());
-        Number rValue = obtainExpressionValueAsNumber(getRightHandSide());
-        return biFunction.apply(lValue, rValue);
+    private P executeBiFunction(BiFunction<Expression,Expression,Expression> biFunction){
+        Expression<L,R,P> lValue = obtainExpressionValue(getLeftHandSide());
+        Expression<L,R,P> rValue = obtainExpressionValue(getRightHandSide());
+        return (P)biFunction.apply(lValue, rValue).apply();
     }
 
+/*
     protected List<Number> obtainExpressionValueAsListOfNumbers(Expression exp){
         List<Number> lhsValue=null;
         if(exp instanceof VariableExpression){
@@ -34,31 +39,32 @@ public class ArithmeticExpression<L extends Expression,R extends Expression ,P e
         }
         return lhsValue;
     }
-    private Number executeFunction(Function<List<Number>,Double> function){
-        List<Number> lValue = obtainExpressionValueAsListOfNumbers(getLeftHandSide());
+*/
+    private P executeFunction(Function<Expression,Expression> function){
+        Expression<L,R,P> lValue = obtainExpressionValue(getLeftHandSide());
         //Number rValue = obtainExpressionValue(getRightHandSide());
-        return function.apply(lValue);
+        return (P)function.apply(lValue).apply();
     }
 
     public P apply(){
         switch (this.getOperator()){
             case ADDITION:
-                BiFunction<Number,Number,Number> add =  (a,b) -> a.doubleValue() + b.doubleValue() ;
-                return (P) executeBiFunction(add);
+                BiFunction<Expression,Expression,Expression> add =  (a,b) -> new UnaryExpression(((Number)a.apply()).doubleValue() + ((Number)b.apply()).doubleValue()) ;
+                return executeBiFunction(add);
             case LOOPADDITION:
-                Function<List<Number>,Double> addInLoop =  (a)->a.stream().mapToDouble(i->i.doubleValue()).sum();
-                return (P)executeFunction(addInLoop);
+                Function<Expression,Expression> addInLoop =  (a)->new UnaryExpression<>(((List<Number>)a.apply()).stream().mapToDouble(i->(i).doubleValue()).sum());
+                return executeFunction(addInLoop);
             case SUBTRACTION:
-                BiFunction<Number,Number,Number> sub = (a, b) -> a.doubleValue() - b.doubleValue() ;
+                BiFunction<Expression,Expression,Expression> sub = (a, b) -> new UnaryExpression<>(((Number)a.apply()).doubleValue() - ((Number)b.apply()).doubleValue() );
                 return (P)executeBiFunction(sub);
             case DIVISION:
-                BiFunction<Number,Number,Number> div =  (a,b) -> a.doubleValue() / b.doubleValue() ;
+                BiFunction<Expression,Expression,Expression> div =  (a,b) ->new UnaryExpression( ((Number)a.apply()).doubleValue() / ((Number)b.apply()).doubleValue() );
                 return (P)executeBiFunction(div);
             case MULTIPLICATION:
-                BiFunction<Number,Number,Number> mul =  (a,b) -> a.doubleValue() * b.doubleValue() ;
+                BiFunction<Expression,Expression,Expression> mul =  (a,b) -> new UnaryExpression<>(((Number)a.apply()).doubleValue() * ((Number)b.apply()).doubleValue() );
                 return (P)executeBiFunction(mul);
             case MODULUS:
-                BiFunction<Number,Number,Number> mod = (a,b) -> a.doubleValue() % b.doubleValue() ;
+                BiFunction<Expression,Expression,Expression> mod = (a,b) -> new UnaryExpression<>(((Number)a.apply()).doubleValue() % ((Number)b.apply()).doubleValue()) ;
                 return (P)executeBiFunction(mod);
             default:
                 throw new IllegalStateException("Unexpected value: " + this.getOperator());
