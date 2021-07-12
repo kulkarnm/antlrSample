@@ -1,6 +1,5 @@
 package com.affaince.benefit.scheme;
 
-import com.sun.org.apache.xpath.internal.ExpressionOwner;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -26,7 +25,7 @@ public class ArithmeticExpression<L extends Expression,R extends Expression ,P e
     private P executeBiFunction(BiFunction<Expression,Expression,Expression> biFunction){
         Expression<L,R,P> lValue = obtainExpressionValue(getLeftHandSide());
         Expression<L,R,P> rValue = obtainExpressionValue(getRightHandSide());
-        return (P)biFunction.apply(lValue, rValue).apply();
+        return (P)biFunction.apply(lValue, rValue);
     }
 
 /*
@@ -43,7 +42,7 @@ public class ArithmeticExpression<L extends Expression,R extends Expression ,P e
     private P executeFunction(Function<Expression,Expression> function){
         Expression<L,R,P> lValue = obtainExpressionValue(getLeftHandSide());
         //Number rValue = obtainExpressionValue(getRightHandSide());
-        return (P)function.apply(lValue).apply();
+        return (P)function.apply(lValue);
     }
 
     public P apply(){

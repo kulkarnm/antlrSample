@@ -1,14 +1,11 @@
 package com.affaince.benefit;
 
 import com.affaince.benefit.scheme.Expression;
-import com.affaince.benefit.scheme.VariableExpression;
+import com.affaince.benefit.scheme.UnaryExpression;
 
-import java.util.List;
 
 public class ExpressionBuilder<L,R,P> {
-    private List<VariableExpression<String,R>> inputs;
-    public Expression<L,R,P> buildExpression(BenefitParser.ExpressionContext expressionContext, List<VariableExpression<String,R>> inputs){
-        this.inputs = inputs;
+    public Expression<L,R,P> buildExpression(BenefitParser.ExpressionContext expressionContext){
         processExpression(expressionContext);
         return null;
     }
@@ -108,14 +105,16 @@ public class ExpressionBuilder<L,R,P> {
         if(null != variableDeclarationStatementContext.ASSIGN() && null != variableDeclarationStatementContext.variableInitializer()){
             Expression<L,R,P> rhs = processVariableInitialization(variableDeclarationStatementContext.variableInitializer());
         }else if(null != variableDeclarationStatementContext.ASINPUT()){
-            Expression<L,R,P> rhs =processVariableInputInitiaization(variableName);
+            Expression<L,R,P> rhs = processVariableInputInitialization(variableName);
         }
         return null;
     }
-    Expression<L,R,P> processVariableInputInitiaization(String variableName){
+    Expression<L,R,P> processVariableInputInitialization(String variableName){
+/*
         for(VariableExpression<String,R> variable : inputs){
             //if((String)variable.getLeftHandSide())
         }
+*/
         return null;
     }
     Expression<L,R,P> processVariableInitialization(BenefitParser.VariableInitializerContext variableInitializerContext){
@@ -183,6 +182,28 @@ public class ExpressionBuilder<L,R,P> {
     }
 
     Expression<L, R, P> processUnaryExpression (BenefitParser.UnaryExpressionContext unaryExpressionContext){
-        unaryExpressionContext.
+        BenefitParser.LiteralContext literalContext = unaryExpressionContext.primary().literal();
+        if(null != literalContext) {
+            if (null != literalContext.NUMBER()) {
+                Number literalNumericValue = Double.parseDouble(literalContext.NUMBER().getText());
+                UnaryExpression<Number> numericUnaryExpression = new UnaryExpression<Number>(literalNumericValue);
+                return (Expression<L, R, P>) numericUnaryExpression;
+            } else if (null != literalContext.StringLiteral()) {
+                String literalStringValue = literalContext.StringLiteral().getText();
+                UnaryExpression<String> stringUnaryExpression = new UnaryExpression<>(literalStringValue);
+                return (Expression<L, R, P>) stringUnaryExpression;
+            } else if (null != literalContext.BooleanLiteral()) {
+                Boolean literalBooleanValue = Boolean.parseBoolean(literalContext.BooleanLiteral().getText());
+                UnaryExpression<Boolean> booleanUnaryExpression = new UnaryExpression<>(literalBooleanValue);
+                return (Expression<L, R, P>) booleanUnaryExpression;
+            } else {
+                String literalStringValue = literalContext.NullLiteral().getText();
+                UnaryExpression<String> stringUnaryExpression = new UnaryExpression<>(literalStringValue);
+                return (Expression<L, R, P>) stringUnaryExpression;
+            }
+        }else if(null != unaryExpressionContext.primary().IDENTIFIER()){
+            return null;
+        }
+        return null;
     }
 }
