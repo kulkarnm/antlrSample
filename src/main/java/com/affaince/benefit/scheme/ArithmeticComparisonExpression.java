@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class ArithmeticComparisonExpression<L extends Expression,R extends Expression ,P extends Boolean> extends Expression <Expression,Expression,Boolean> {
+public class ArithmeticComparisonExpression<L extends Expression,R extends Expression ,P extends Boolean> extends Expression <L,R,P> {
     public ArithmeticComparisonExpression(ArithmeticOperator operator, L leftHandSide, R rightHandSide) {
         super(operator, leftHandSide, rightHandSide);
     }
@@ -24,44 +24,44 @@ public class ArithmeticComparisonExpression<L extends Expression,R extends Expre
         Number rValue = obtainExpressionValue(getRightHandSide());
         return biFunction.apply(lValue, rValue);
     }
-    public Boolean apply(){
+    public P apply(){
         switch (this.getOperator()){
             case EQUALTO:
                 BiFunction<Number,Number,Boolean> equalTo = (a,b) -> a.doubleValue() == b.doubleValue() ;
-                return executeBiFunction(equalTo);
+                return (P)executeBiFunction(equalTo);
             case LOOPEQUALTO:
                 BiFunction<List<Number>,Number,Boolean> equalityInLoop =  (a,b)->a.stream().allMatch(i-> i.doubleValue() == b.doubleValue());
-                return executeBiFunction(equalityInLoop);
+                return (P)executeBiFunction(equalityInLoop);
             case GREATERTHAN:
                 BiFunction<Number,Number,Boolean> greaterThan = (a,b) -> a.doubleValue() > b.doubleValue() ;
-                return executeBiFunction(greaterThan);
+                return (P)executeBiFunction(greaterThan);
             case LOOPGREATERTHAN:
                 BiFunction<List<Number>,Number,Boolean> greaterThanInLoop =  (a,b)->a.stream().allMatch(i-> i.doubleValue() > b.doubleValue());
-                return executeBiFunction(greaterThanInLoop);
+                return (P)executeBiFunction(greaterThanInLoop);
             case GREATERTHANEQUALTO:
                 BiFunction<Number,Number,Boolean> greaterThanEqualTo = (a,b) -> a.doubleValue() >= b.doubleValue() ;
-                return executeBiFunction(greaterThanEqualTo);
+                return (P)executeBiFunction(greaterThanEqualTo);
             case LOOPGREATERTHANEQUALTO:
                 BiFunction<List<Number>,Number,Boolean> greaterThanEqualToInLoop =  (a,b)->a.stream().allMatch(i-> i.doubleValue() >= b.doubleValue());
-                return executeBiFunction(greaterThanEqualToInLoop);
+                return (P)executeBiFunction(greaterThanEqualToInLoop);
             case LESSTHAN:
                 BiFunction<Number,Number,Boolean> lessThan = (a,b) -> a.doubleValue() < b.doubleValue() ;
-                return executeBiFunction(lessThan);
+                return (P)executeBiFunction(lessThan);
             case LOOPLESSTHAN:
                 BiFunction<List<Number>,Number,Boolean> lessThanInLoop =  (a,b)->a.stream().allMatch(i-> i.doubleValue() < b.doubleValue());
-                return executeBiFunction(lessThanInLoop);
+                return (P)executeBiFunction(lessThanInLoop);
             case LESSTHANEQUALTO:
                 BiFunction<Number,Number,Boolean> lessThanEqualTo = (a,b) -> a.doubleValue() <= b.doubleValue() ;
-                return executeBiFunction(lessThanEqualTo);
+                return (P)executeBiFunction(lessThanEqualTo);
             case LOOPLESSTHANEQUALTO:
                 BiFunction<List<Number>,Number,Boolean> lessThanEqualToInLoop =  (a,b)->a.stream().allMatch(i-> i.doubleValue() <= b.doubleValue());
-                return executeBiFunction(lessThanEqualToInLoop);
+                return (P)executeBiFunction(lessThanEqualToInLoop);
             case NOTEQUALTO:
                 BiFunction<Number,Number,Boolean> notEqualTo = (a,b) -> a.doubleValue() != b.doubleValue() ;
-                return executeBiFunction(notEqualTo);
+                return (P)executeBiFunction(notEqualTo);
             case LOOPNOTEQUALTO:
                 BiFunction<List<Number>,Number,Boolean> notEqualToInLoop =  (a,b)->a.stream().allMatch(i-> i.doubleValue() != b.doubleValue());
-                return executeBiFunction(notEqualToInLoop);
+                return (P)executeBiFunction(notEqualToInLoop);
             default:
                 throw new IllegalStateException("Unexpected value: " + this.getOperator());
         }

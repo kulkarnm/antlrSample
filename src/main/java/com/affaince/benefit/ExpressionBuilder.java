@@ -6,8 +6,8 @@ import com.affaince.benefit.scheme.VariableExpression;
 import java.util.List;
 
 public class ExpressionBuilder<L,R,P> {
-    private List<VariableExpression<L,R>> inputs;
-    public Expression<L,R,P> buildExpression(BenefitParser.ExpressionContext expressionContext, List<VariableExpression<L,R>> inputs){
+    private List<VariableExpression<String,R>> inputs;
+    public Expression<L,R,P> buildExpression(BenefitParser.ExpressionContext expressionContext, List<VariableExpression<String,R>> inputs){
         this.inputs = inputs;
         processExpression(expressionContext);
         return null;
@@ -113,7 +113,7 @@ public class ExpressionBuilder<L,R,P> {
         return null;
     }
     Expression<L,R,P> processVariableInputInitiaization(String variableName){
-        for(VariableExpression<L,R> variable : inputs){
+        for(VariableExpression<String,R> variable : inputs){
             //if((String)variable.getLeftHandSide())
         }
         return null;
@@ -130,7 +130,59 @@ public class ExpressionBuilder<L,R,P> {
         return null;
     }
 
-    Expression<L,R,P> processAdditiveExpression(BenefitParser.AdditiveExpressionContext additiveExpressionContext){
+    Expression<L,R,P> processAdditiveExpression(BenefitParser.AdditiveExpressionContext additiveExpressionContext) {
+        if (null != additiveExpressionContext.multiplicativeExpression(0)) {
+            Expression<L, R, P> lhs = processMultiplicationExpression(additiveExpressionContext.multiplicativeExpression(0));
+            if (null != additiveExpressionContext.ADD() &&
+                    !additiveExpressionContext.ADD().isEmpty() &&
+                    null != additiveExpressionContext.multiplicativeExpression() &&
+                    !additiveExpressionContext.multiplicativeExpression().isEmpty()) {
+                for (BenefitParser.MultiplicativeExpressionContext multiplicativeExpressionContext : additiveExpressionContext.multiplicativeExpression()) {
+                    Expression<L, R, P> rhs = processMultiplicationExpression(multiplicativeExpressionContext);
+                }
+            } else if (null != additiveExpressionContext.SUB() &&
+                    !additiveExpressionContext.SUB().isEmpty() &&
+                    null != additiveExpressionContext.multiplicativeExpression() &&
+                    !additiveExpressionContext.multiplicativeExpression().isEmpty()) {
+                for (BenefitParser.MultiplicativeExpressionContext multiplicativeExpressionContext : additiveExpressionContext.multiplicativeExpression()) {
+                    Expression<L, R, P> rhs = processMultiplicationExpression(multiplicativeExpressionContext);
+                }
+            }
+
+        }
         return null;
+    }
+
+    Expression<L,R,P> processMultiplicationExpression(BenefitParser.MultiplicativeExpressionContext multiplicativeExpressionContext) {
+        if (null != multiplicativeExpressionContext.unaryExpression(0)) {
+            Expression<L, R, P> lhs = processUnaryExpression(multiplicativeExpressionContext.unaryExpression(0));
+            if (null != multiplicativeExpressionContext.MUL() &&
+                    !multiplicativeExpressionContext.MUL().isEmpty() &&
+                    null != multiplicativeExpressionContext.unaryExpression() &&
+                    !multiplicativeExpressionContext.unaryExpression().isEmpty()) {
+                for (BenefitParser.UnaryExpressionContext unaryExpressionContext : multiplicativeExpressionContext.unaryExpression()) {
+                    Expression<L, R, P> rhs = processUnaryExpression(unaryExpressionContext);
+                }
+            } else if (null != multiplicativeExpressionContext.DIV() &&
+                    !multiplicativeExpressionContext.DIV().isEmpty() &&
+                    null != multiplicativeExpressionContext.unaryExpression() &&
+                    !multiplicativeExpressionContext.unaryExpression().isEmpty()) {
+                for (BenefitParser.UnaryExpressionContext unaryExpressionContext : multiplicativeExpressionContext.unaryExpression()) {
+                    Expression<L, R, P> rhs = processUnaryExpression(unaryExpressionContext);
+                }
+            } else if (null != multiplicativeExpressionContext.MOD() &&
+                    !multiplicativeExpressionContext.MOD().isEmpty() &&
+                    null != multiplicativeExpressionContext.unaryExpression() &&
+                    !multiplicativeExpressionContext.unaryExpression().isEmpty()) {
+                for (BenefitParser.UnaryExpressionContext unaryExpressionContext : multiplicativeExpressionContext.unaryExpression()) {
+                    Expression<L, R, P> rhs = processUnaryExpression(unaryExpressionContext);
+                }
+            }
+        }
+        return null;
+    }
+
+    Expression<L, R, P> processUnaryExpression (BenefitParser.UnaryExpressionContext unaryExpressionContext){
+        unaryExpressionContext.
     }
 }

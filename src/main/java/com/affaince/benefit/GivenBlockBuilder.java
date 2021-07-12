@@ -2,9 +2,9 @@ package com.affaince.benefit;
 
 import com.affaince.benefit.scheme.Expression;
 
-public class GivenExpressionBuilder {
+public class GivenBlockBuilder {
 
-    public Expression buildGivenExpression(BenefitParser.GivenUnitContext ctx){
+    public Expression buildGivenBlock(BenefitParser.GivenUnitContext ctx){
         if(ctx.GIVEN().getText() == "given"){
             ctx.givenBody().block().blockStatement().stream().forEach(stmt->{
                 BenefitParser.VariableDeclarationStatementContext variableDeclarationStatementContext = stmt.variableDeclarationStatement();

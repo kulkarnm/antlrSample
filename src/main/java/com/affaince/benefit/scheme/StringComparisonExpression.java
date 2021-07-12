@@ -3,7 +3,7 @@ package com.affaince.benefit.scheme;
 
 import java.util.function.BiFunction;
 
-public class StringComparisonExpression<L extends Expression,R extends Expression ,P extends Boolean> extends Expression <Expression,Expression,Boolean> {
+public class StringComparisonExpression<L extends Expression,R extends Expression ,P extends Boolean> extends Expression <L,R,P> {
     public StringComparisonExpression(ArithmeticOperator operator, L leftHandSide, R rightHandSide) {
         super(operator, leftHandSide, rightHandSide);
     }
@@ -22,14 +22,14 @@ public class StringComparisonExpression<L extends Expression,R extends Expressio
         String rValue = obtainExpressionValue(getRightHandSide());
         return biFunction.apply(lValue, rValue);
     }
-    public Boolean apply(){
+    public P apply(){
         switch (this.getOperator()){
             case EQUALTO:
                 BiFunction<String,String,Boolean> equalTo = (a,b) -> a.equals(b) ;
-                return executeBiFunction(equalTo);
+                return (P)executeBiFunction(equalTo);
             case NOTEQUALTO:
                 BiFunction<String,String,Boolean> notEqualTo = (a,b) -> !(a.equals(b)) ;
-                return executeBiFunction(notEqualTo);
+                return (P)executeBiFunction(notEqualTo);
             default:
                 throw new IllegalStateException("Unexpected value: " + this.getOperator());
         }

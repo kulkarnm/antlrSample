@@ -5,7 +5,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.lang.Double;
 
-public class ArithmeticExpression<L extends Expression,R extends Expression ,P extends Number> extends Expression<Expression,Expression,Number> {
+public class ArithmeticExpression<L extends Expression,R extends Expression ,P extends Number> extends Expression<L,R,P> {
     public ArithmeticExpression(ArithmeticOperator operator, L leftHandSide, R rightHandSide) {
         super(operator, leftHandSide, rightHandSide);
     }
@@ -40,26 +40,26 @@ public class ArithmeticExpression<L extends Expression,R extends Expression ,P e
         return function.apply(lValue);
     }
 
-    public Number apply(){
+    public P apply(){
         switch (this.getOperator()){
             case ADDITION:
-                BiFunction<Number,Number,Number> add =  (a, b) -> a.doubleValue() + b.doubleValue() ;
-                return executeBiFunction(add);
+                BiFunction<Number,Number,Number> add =  (a,b) -> a.doubleValue() + b.doubleValue() ;
+                return (P) executeBiFunction(add);
             case LOOPADDITION:
                 Function<List<Number>,Double> addInLoop =  (a)->a.stream().mapToDouble(i->i.doubleValue()).sum();
-                return executeFunction(addInLoop);
+                return (P)executeFunction(addInLoop);
             case SUBTRACTION:
                 BiFunction<Number,Number,Number> sub = (a, b) -> a.doubleValue() - b.doubleValue() ;
-                return executeBiFunction(sub);
+                return (P)executeBiFunction(sub);
             case DIVISION:
                 BiFunction<Number,Number,Number> div =  (a,b) -> a.doubleValue() / b.doubleValue() ;
-                return executeBiFunction(div);
+                return (P)executeBiFunction(div);
             case MULTIPLICATION:
                 BiFunction<Number,Number,Number> mul =  (a,b) -> a.doubleValue() * b.doubleValue() ;
-                return executeBiFunction(mul);
+                return (P)executeBiFunction(mul);
             case MODULUS:
                 BiFunction<Number,Number,Number> mod = (a,b) -> a.doubleValue() % b.doubleValue() ;
-                return executeBiFunction(mod);
+                return (P)executeBiFunction(mod);
             default:
                 throw new IllegalStateException("Unexpected value: " + this.getOperator());
         }
