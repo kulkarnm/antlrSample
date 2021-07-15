@@ -20,5 +20,7 @@ public enum ArithmeticOperator {
     NOTEQUALTO,
     LOOPNOTEQUALTO,
     TERNARY,
-    ASSIGN
+    ASSIGN,
+    OR,
+    AND
 }

@@ -34,6 +34,5 @@ public class TestMain {
                         new VariableExpression<>("list",u3),
                         new VariableExpression<>(null,null));
         System.out.println(exp3.apply().apply());
-
     }
 }

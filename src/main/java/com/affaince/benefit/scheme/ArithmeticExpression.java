@@ -67,8 +67,21 @@ public class ArithmeticExpression<L extends Expression, R extends Expression, P 
                 BiFunction<Expression, Expression, Expression> mod = (a, b) -> new UnaryExpression<>(((Number) a.apply()).doubleValue() % ((Number) b.apply()).doubleValue());
                 return (P) executeBiFunction(mod);
             case TERNARY:
-                Function<Expression,Expression> conditionExpression = (p) -> new UnaryExpression<>(((UnaryExpression<Boolean>) ((ArithmeticComparisonExpression<Expression, Expression, Expression>) p).apply()).apply());
-                BiFunction<Expression, Expression, Expression> ternary = (a, b) -> new UnaryExpression<>(((UnaryExpression<Boolean>)conditionExpression).apply() ? ((Number) b.apply()).doubleValue() : ((Number) b.apply()).doubleValue());
+                BiFunction<Expression, Expression, Expression> ternary=null;
+                ArithmeticComparisonExpression<L,R,UnaryExpression<Boolean> > conditionalExpression = (ArithmeticComparisonExpression<L,R,UnaryExpression<Boolean>>)this.getPreExpression();
+                if(this.getLeftHandSide().apply() instanceof Number) {
+                    if(this.getRightHandSide().apply() instanceof  Number) {
+                        ternary = (a, b) -> new UnaryExpression<>(conditionalExpression.apply().apply() ? ((Number) a.apply()).doubleValue() : ((Number) b.apply()).doubleValue());
+                    }else if( this.getRightHandSide().apply() instanceof ArithmeticExpression){
+                        ternary = (a, b) -> new UnaryExpression<>(conditionalExpression.apply().apply() ? ((Number) a.apply()).doubleValue() : ((ArithmeticExpression) b.apply()));
+                    }
+                }else if(this.getLeftHandSide().apply() instanceof ArithmeticExpression){
+                    if(this.getRightHandSide().apply() instanceof  Number) {
+                        ternary = (a, b) -> new UnaryExpression<>(conditionalExpression.apply().apply() ? ((ArithmeticExpression) a.apply()) : ((Number) b.apply()).doubleValue());
+                    }else if( this.getRightHandSide().apply() instanceof ArithmeticExpression){
+                        ternary = (a, b) -> new UnaryExpression<>(conditionalExpression.apply().apply() ? ((ArithmeticExpression) a.apply()) : ((ArithmeticExpression) b.apply()));
+                    }
+                }
                 return (P) executeBiFunction(ternary);
 
             default:
