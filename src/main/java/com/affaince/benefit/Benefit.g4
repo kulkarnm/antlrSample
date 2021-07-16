@@ -45,7 +45,7 @@ variableDeclarationStatement
     |   variableDeclaratorId ASSIGN statement
     ;
 variableDeclaratorId
-    :   IDENTIFIER ('[' ']')*
+    :   IDENTIFIER ('[' ']')    //* is removed as we do not intend to support multidimensional arrays as of now
     ;
 
 variableInitializer
