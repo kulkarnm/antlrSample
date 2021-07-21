@@ -1,12 +1,13 @@
 package com.affaince.benefit.scheme;
 
 
-public class UnaryExpression<L> extends Expression<L,L,L>  {
-    public UnaryExpression(L variableValue) {
-        super(null,variableValue,null);
+public class UnaryExpression extends Expression{
+    public UnaryExpression(Object value) {
+        super(value);
     }
 
-    public L apply() {
-        return getLeftHandSide();
+    @Override
+    public Object apply() {
+        return this.getValue();
     }
 }

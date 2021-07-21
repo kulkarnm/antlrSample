@@ -1,42 +1,46 @@
 package com.affaince.benefit.scheme;
 import java.lang.reflect.ParameterizedType;
-import java.util.function.BiFunction;
-import java.util.function.UnaryOperator;
 
-public abstract class Expression< L,R,P> {
+public abstract class Expression {
     private ArithmeticOperator operator;
-    private L leftHandSide;
-    private R rightHandSide;
-    private Expression<L,R,P> preExpression; //just for ternary
+    private Expression leftHandSide;
+    private Expression rightHandSide;
+    private Expression preExpression; //just for ternary
+    private Object value;
 
-    public Expression(ArithmeticOperator operator, L leftHandSide, R rightHandSide) {
+    public Expression(ArithmeticOperator operator, Expression leftHandSide, Expression rightHandSide) {
         this.operator = operator;
         this.leftHandSide = leftHandSide;
         this.rightHandSide = rightHandSide;
     }
-
+    public Expression(Object value){
+        this.value=value;
+    }
     public ArithmeticOperator getOperator() {
         return operator;
     }
 
-    public Expression<L, R, P> getPreExpression() {
+    public Expression getPreExpression() {
         return preExpression;
     }
 
-    public void setPreExpression(Expression<L, R, P> preExpression) {
+    public void setPreExpression(Expression preExpression) {
         this.preExpression = preExpression;
     }
 
-    public L getLeftHandSide() {
+    public Expression getLeftHandSide() {
         return leftHandSide;
     }
 
-    public R getRightHandSide() {
+    public Expression getRightHandSide() {
         return rightHandSide;
     }
 
+    public Object getValue() {
+        return value;
+    }
 
-    public abstract P apply();
+    public abstract Object apply();
 
     public Class parameterizedType() {
         return (Class) ((ParameterizedType)

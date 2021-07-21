@@ -3,67 +3,62 @@ package com.affaince.benefit.scheme;
 
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
-public class ArithmeticComparisonExpression<L extends Expression,R extends Expression ,P extends Expression> extends Expression <L,R,P> {
-    public ArithmeticComparisonExpression(ArithmeticOperator operator, L leftHandSide, R rightHandSide) {
+public class ArithmeticComparisonExpression extends Expression {
+    public ArithmeticComparisonExpression(ArithmeticOperator operator, Expression leftHandSide, Expression rightHandSide) {
         super(operator, leftHandSide, rightHandSide);
     }
 
-    protected Expression<L, R, P> obtainExpressionValue(Expression exp){
-        Expression<L,R,P> lhsValue=null;
-        if(exp instanceof VariableExpression){
-            lhsValue = ((VariableExpression)exp).apply();
-        }else if (exp instanceof UnaryExpression){
-            lhsValue=exp;
-        }else{
-            lhsValue = obtainExpressionValue((ArithmeticExpression)exp);
-        }
-        return lhsValue;
-    }
-    private P executeBiFunction(BiFunction<Expression,Expression,Expression> biFunction){
-        Expression<L,R,P> lValue = obtainExpressionValue(getLeftHandSide());
-        Expression<L,R,P> rValue = obtainExpressionValue(getRightHandSide());
-        return (P)biFunction.apply(lValue, rValue);
+    private Object executeBiFunction(BiFunction<Expression,Expression, ?> biFunction) {
+        return biFunction.apply(getLeftHandSide(),getRightHandSide());
     }
 
-    public P apply(){
+
+
+    private Object executeFunction(Function<Expression, ?> function) {
+        return function.apply(getLeftHandSide());
+    }
+
+
+    public Object apply(){
         switch (this.getOperator()){
             case EQUALTO:
-                BiFunction<Expression,Expression,Expression> equalTo = (a,b) -> new UnaryExpression<>(((Number)a.apply()).doubleValue() == ((Number)b.apply()).doubleValue()) ;
-                return (P)executeBiFunction(equalTo);
+                BiFunction<Expression,Expression,?> equalTo = (a,b) -> ((Number)a.apply()).doubleValue() == ((Number)b.apply()).doubleValue();
+                return executeBiFunction(equalTo);
             case LOOPEQUALTO:
-                BiFunction<Expression,Expression,Expression> equalityInLoop =  (a,b)->new UnaryExpression<>(((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() == ((Number)b.apply()).doubleValue()));
-                return (P)executeBiFunction(equalityInLoop);
+                BiFunction<Expression,Expression,?> equalityInLoop =  (a,b)->((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() == ((Number)b.apply()).doubleValue());
+                return executeBiFunction(equalityInLoop);
             case GREATERTHAN:
-                BiFunction<Expression,Expression,Expression> greaterThan = (a,b) -> new UnaryExpression<>(((Number)a.apply()).doubleValue() > ((Number)b.apply()).doubleValue() );
-                return (P)executeBiFunction(greaterThan);
+                BiFunction<Expression,Expression,?> greaterThan = (a,b) -> ((Number)a.apply()).doubleValue() > ((Number)b.apply()).doubleValue();
+                return executeBiFunction(greaterThan);
             case LOOPGREATERTHAN:
-                BiFunction<Expression,Expression,Expression> greaterThanInLoop =  (a,b)->new UnaryExpression<>(((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() > ((Number)b.apply()).doubleValue()));
-                return (P)executeBiFunction(greaterThanInLoop);
+                BiFunction<Expression,Expression,?> greaterThanInLoop =  (a,b)->((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() > ((Number)b.apply()).doubleValue());
+                return executeBiFunction(greaterThanInLoop);
             case GREATERTHANEQUALTO:
-                BiFunction<Expression,Expression,Expression> greaterThanEqualTo = (a,b) -> new UnaryExpression<>(((Number)a.apply()).doubleValue() >= ((Number)b.apply()).doubleValue() );
-                return (P)executeBiFunction(greaterThanEqualTo);
+                BiFunction<Expression,Expression,?> greaterThanEqualTo = (a,b) -> ((Number)a.apply()).doubleValue() >= ((Number)b.apply()).doubleValue();
+                return executeBiFunction(greaterThanEqualTo);
             case LOOPGREATERTHANEQUALTO:
-                BiFunction<Expression,Expression,Expression> greaterThanEqualToInLoop =  (a,b)->new UnaryExpression<>(((List<Number>)a).stream().allMatch(i-> i.doubleValue() >= ((Number)b.apply()).doubleValue()));
-                return (P)executeBiFunction(greaterThanEqualToInLoop);
+                BiFunction<Expression,Expression,?> greaterThanEqualToInLoop =  (a,b)->((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() >= ((Number)b.apply()).doubleValue());
+                return executeBiFunction(greaterThanEqualToInLoop);
             case LESSTHAN:
-                BiFunction<Expression,Expression,Expression> lessThan = (a,b) -> new UnaryExpression<>(((Number)a.apply()).doubleValue() < ((Number)b.apply()).doubleValue() );
-                return (P)executeBiFunction(lessThan);
+                BiFunction<Expression,Expression,?> lessThan = (a,b) -> ((Number)a.apply()).doubleValue() < ((Number)b.apply()).doubleValue();
+                return executeBiFunction(lessThan);
             case LOOPLESSTHAN:
-                BiFunction<Expression,Expression,Expression> lessThanInLoop =  (a,b)->new UnaryExpression<>(((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() < ((Number)b.apply()).doubleValue()));
-                return (P)executeBiFunction(lessThanInLoop);
+                BiFunction<Expression,Expression,?> lessThanInLoop =  (a,b)->((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() < ((Number)b.apply()).doubleValue());
+                return executeBiFunction(lessThanInLoop);
             case LESSTHANEQUALTO:
-                BiFunction<Expression,Expression,Expression> lessThanEqualTo = (a,b) -> new UnaryExpression<>(((Number)a.apply()).doubleValue() <= ((Number)b.apply()).doubleValue() );
-                return (P)executeBiFunction(lessThanEqualTo);
+                BiFunction<Expression,Expression,?> lessThanEqualTo = (a,b) -> ((Number)a.apply()).doubleValue() <= ((Number)b.apply()).doubleValue() ;
+                return executeBiFunction(lessThanEqualTo);
             case LOOPLESSTHANEQUALTO:
-                BiFunction<Expression,Expression,Expression> lessThanEqualToInLoop =  (a,b)->new UnaryExpression<>(((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() <= ((Number)b.apply()).doubleValue()));
-                return (P)executeBiFunction(lessThanEqualToInLoop);
+                BiFunction<Expression,Expression,?> lessThanEqualToInLoop =  (a,b)->((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() <= ((Number)b.apply()).doubleValue());
+                return executeBiFunction(lessThanEqualToInLoop);
             case NOTEQUALTO:
-                BiFunction<Expression,Expression,Expression> notEqualTo = (a,b) -> new UnaryExpression<>(((Number)a.apply()).doubleValue() != ((Number)b.apply()).doubleValue() );
-                return (P)executeBiFunction(notEqualTo);
+                BiFunction<Expression,Expression,?> notEqualTo = (a,b) -> ((Number)a.apply()).doubleValue() != ((Number)b.apply()).doubleValue();
+                return executeBiFunction(notEqualTo);
             case LOOPNOTEQUALTO:
-                BiFunction<Expression,Expression,Expression> notEqualToInLoop =  (a,b)->new UnaryExpression<>(((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() != ((Number)b.apply()).doubleValue()));
-                return (P)executeBiFunction(notEqualToInLoop);
+                BiFunction<Expression,Expression,?> notEqualToInLoop =  (a,b)->((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() != ((Number)b.apply()).doubleValue());
+                return executeBiFunction(notEqualToInLoop);
             default:
                 throw new IllegalStateException("Unexpected value: " + this.getOperator());
         }

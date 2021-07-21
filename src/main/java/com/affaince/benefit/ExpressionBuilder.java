@@ -6,97 +6,95 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ExpressionBuilder<L, R, P> {
-    public Expression<L, R, P> buildExpression(BenefitParser.ExpressionContext expressionContext) {
+public class ExpressionBuilder {
+    public Expression buildExpression(BenefitParser.ExpressionContext expressionContext) {
         return processExpression(expressionContext);
     }
 
-    private Expression<L, R, P> processExpression(BenefitParser.ExpressionContext expressionContext) {
-        //first check for expression type
-
+    private Expression processExpression(BenefitParser.ExpressionContext expressionContext) {
         if (null != expressionContext.conditionalExpression()) {
-            Expression<L, R, P> lhs = processConditionalExpression(expressionContext.conditionalExpression());
+            Expression lhs = processConditionalExpression(expressionContext.conditionalExpression());
             if (null != expressionContext.ASSIGN() && null != expressionContext.expression()) {
-                Expression<L, R, P> rhs = processExpression(expressionContext.expression());
-                return (Expression<L, R, P>) new ArithmeticExpression<>(ArithmeticOperator.ASSIGN, lhs, rhs);
+                Expression rhs = processExpression(expressionContext.expression());
+                return  new ArithmeticExpression(ArithmeticOperator.ASSIGN, lhs, rhs);
             }
         }
         return null;
     }
 
-    Expression<L, R, P> processConditionalExpression(BenefitParser.ConditionalExpressionContext conditionalExpressionContext) {
-        Expression<L, R, P> lhs = null;
-        Expression<L, R, P> rhs = null;
+    private Expression processConditionalExpression(BenefitParser.ConditionalExpressionContext conditionalExpressionContext) {
+        Expression lhs = null;
+        Expression rhs = null;
         if (null != conditionalExpressionContext.conditionalOrExpression()) {
             if (null != conditionalExpressionContext.QUESTIONMARK() && null != conditionalExpressionContext.expression()) {
-                ArithmeticComparisonExpression<Expression, Expression, UnaryExpression<Boolean>> preExpression = (ArithmeticComparisonExpression<Expression, Expression, UnaryExpression<Boolean>>) processConditionalOrExpression(conditionalExpressionContext.conditionalOrExpression());
+                ArithmeticComparisonExpression preExpression = (ArithmeticComparisonExpression)processConditionalOrExpression(conditionalExpressionContext.conditionalOrExpression());
                 lhs = processExpression(conditionalExpressionContext.expression());
                 if (null != conditionalExpressionContext.COLON() && null != conditionalExpressionContext.conditionalExpression()) {
                     rhs = processConditionalExpression(conditionalExpressionContext.conditionalExpression());
                 }
-                Expression<L, R, P> resultExpression = (Expression<L, R, P>) new ArithmeticExpression<Expression, Expression, Expression>(null, lhs, rhs);
-                resultExpression.setPreExpression((Expression<L, R, P>) preExpression);
+                Expression resultExpression = new ArithmeticExpression(null, lhs, rhs);
+                resultExpression.setPreExpression(preExpression);
                 return resultExpression;
             } else {
-                Expression<L, R, P> arithmeticExpression = processConditionalOrExpression(conditionalExpressionContext.conditionalOrExpression());
+                Expression arithmeticExpression = processConditionalOrExpression(conditionalExpressionContext.conditionalOrExpression());
                 return arithmeticExpression;
             }
         }
         return null;
     }
 
-    Expression<L, R, P> processConditionalOrExpression(BenefitParser.ConditionalOrExpressionContext conditionalOrExpressionContext) {
+    Expression processConditionalOrExpression(BenefitParser.ConditionalOrExpressionContext conditionalOrExpressionContext) {
         if (null != conditionalOrExpressionContext.conditionalAndExpression(0)) {
             if (null != conditionalOrExpressionContext.ORSTR() &&
                     !conditionalOrExpressionContext.ORSTR().isEmpty() &&
                     null != conditionalOrExpressionContext.conditionalAndExpression() &&
                     !conditionalOrExpressionContext.conditionalAndExpression().isEmpty()) {
-                ArithmeticComparisonExpression<Expression, Expression, UnaryExpression<Boolean>> lhsExpression = (ArithmeticComparisonExpression<Expression, Expression, UnaryExpression<Boolean>>) processConditionalAndExpression(conditionalOrExpressionContext.conditionalAndExpression(0));
+                ArithmeticComparisonExpression lhsExpression = (ArithmeticComparisonExpression) processConditionalAndExpression(conditionalOrExpressionContext.conditionalAndExpression(0));
                 for (BenefitParser.ConditionalAndExpressionContext conditionalAndExpressionContext : conditionalOrExpressionContext.conditionalAndExpression()) {
-                    lhsExpression = new ArithmeticComparisonExpression<Expression, Expression, UnaryExpression<Boolean>>(ArithmeticOperator.OR, lhsExpression, processConditionalAndExpression(conditionalAndExpressionContext));
+                    lhsExpression = new ArithmeticComparisonExpression(ArithmeticOperator.OR, lhsExpression, processConditionalAndExpression(conditionalAndExpressionContext));
                 }
-                return (Expression<L, R, P>) lhsExpression;
+                return lhsExpression;
             } else {
-                Expression<L, R, P> arithmeticExpression = processConditionalAndExpression(conditionalOrExpressionContext.conditionalAndExpression(0));
+                Expression arithmeticExpression = processConditionalAndExpression(conditionalOrExpressionContext.conditionalAndExpression(0));
                 return arithmeticExpression;
             }
         }
         return null;
     }
 
-    Expression<L, R, P> processConditionalAndExpression(BenefitParser.ConditionalAndExpressionContext conditionalAndExpressionContext) {
+    Expression processConditionalAndExpression(BenefitParser.ConditionalAndExpressionContext conditionalAndExpressionContext) {
         if (null != conditionalAndExpressionContext.relationalExpression(0)) {
             if (null != conditionalAndExpressionContext.ANDSTR() &&
                     !conditionalAndExpressionContext.ANDSTR().isEmpty() &&
                     null != conditionalAndExpressionContext.relationalExpression() &&
                     !conditionalAndExpressionContext.relationalExpression().isEmpty()) {
-                ArithmeticComparisonExpression<Expression, Expression, UnaryExpression<Boolean>> lhsExpression = (ArithmeticComparisonExpression<Expression, Expression, UnaryExpression<Boolean>>) processRelationalExpression(conditionalAndExpressionContext.relationalExpression(0));
+                ArithmeticComparisonExpression lhsExpression = (ArithmeticComparisonExpression) processRelationalExpression(conditionalAndExpressionContext.relationalExpression(0));
                 for (BenefitParser.RelationalExpressionContext relationalExpressionContext : conditionalAndExpressionContext.relationalExpression()) {
-                    lhsExpression = new ArithmeticComparisonExpression<Expression, Expression, UnaryExpression<Boolean>>(ArithmeticOperator.AND, lhsExpression, processRelationalExpression(relationalExpressionContext));
+                    lhsExpression = new ArithmeticComparisonExpression(ArithmeticOperator.AND, lhsExpression, processRelationalExpression(relationalExpressionContext));
                 }
-                return (Expression<L, R, P>) lhsExpression;
+                return lhsExpression;
             } else {
-                Expression<L, R, P> arithmeticExpression = processRelationalExpression(conditionalAndExpressionContext.relationalExpression(0));
+                Expression arithmeticExpression = processRelationalExpression(conditionalAndExpressionContext.relationalExpression(0));
                 return arithmeticExpression;
             }
         }
         return null;
     }
 
-    Expression<L, R, P> processRelationalExpression(BenefitParser.RelationalExpressionContext relationalExpressionContext) {
+    Expression processRelationalExpression(BenefitParser.RelationalExpressionContext relationalExpressionContext) {
         if (null != relationalExpressionContext.additiveExpression(0)) {
             if (null != relationalExpressionContext.relationalOp() &&
                     !relationalExpressionContext.relationalOp().isEmpty() &&
                     null != relationalExpressionContext.additiveExpression() &&
                     !relationalExpressionContext.additiveExpression().isEmpty()) {
-                Expression<L, R, P> lhsExpression = processAdditiveExpression(relationalExpressionContext.additiveExpression(0));
+                Expression lhsExpression = processAdditiveExpression(relationalExpressionContext.additiveExpression(0));
                 for (int i = 0; i < relationalExpressionContext.additiveExpression().size(); i++) {
                     BenefitParser.RelationalOpContext relationalOp = relationalExpressionContext.relationalOp(i);
-                    lhsExpression = (Expression<L, R, P>) new ArithmeticComparisonExpression<Expression, Expression, UnaryExpression<Boolean>>(resolveOperatorForRelationalContext(relationalOp), lhsExpression, processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i)));
+                    lhsExpression = new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOp), lhsExpression, processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i)));
                 }
                 return lhsExpression;
             } else {
-                Expression<L, R, P> arithmeticExpression = processAdditiveExpression(relationalExpressionContext.additiveExpression(0));
+                Expression arithmeticExpression = processAdditiveExpression(relationalExpressionContext.additiveExpression(0));
                 return arithmeticExpression;
             }
         } else if (null != relationalExpressionContext.iterativeStatement()) {
@@ -105,14 +103,14 @@ public class ExpressionBuilder<L, R, P> {
                     !relationalExpressionContext.relationalOp().isEmpty() &&
                     null != relationalExpressionContext.additiveExpression() &&
                     !relationalExpressionContext.additiveExpression().isEmpty()) {
-                Expression<L, R, P> lhsExpression = processIterativeStatement(relationalExpressionContext.iterativeStatement());
+                Expression lhsExpression = processIterativeStatement(relationalExpressionContext.iterativeStatement());
                 for (int i = 0; i < relationalExpressionContext.additiveExpression().size(); i++) {
                     BenefitParser.RelationalOpContext relationalOp = relationalExpressionContext.relationalOp(i);
-                    lhsExpression = (Expression<L, R, P>) new ArithmeticComparisonExpression<Expression, Expression, UnaryExpression<Boolean>>(resolveOperatorForRelationalContext(relationalOp), lhsExpression, processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i)));
+                    lhsExpression = new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOp), lhsExpression, processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i)));
                 }
                 return lhsExpression;
             } else {
-                Expression<L, R, P> arithmeticExpression = processIterativeStatement(relationalExpressionContext.iterativeStatement());
+                Expression arithmeticExpression = processIterativeStatement(relationalExpressionContext.iterativeStatement());
                 return arithmeticExpression;
             }
         }
@@ -136,42 +134,41 @@ public class ExpressionBuilder<L, R, P> {
         return null;
     }
 
-    Expression<L, R, P> processIterativeStatement(BenefitParser.IterativeStatementContext iterativeStatementContext) {
+    Expression processIterativeStatement(BenefitParser.IterativeStatementContext iterativeStatementContext) {
         if (null != iterativeStatementContext.SUMOF()) {
 
             if (null != iterativeStatementContext.EACH() && null != iterativeStatementContext.variableDeclarationStatement()) {
-                VariableExpression<String, Expression> variableExpression = (VariableExpression<String, Expression>)processVariableDeclaration(iterativeStatementContext.variableDeclarationStatement());
-                String variableName = variableExpression.getLeftHandSide();
-                List<Expression<L, R, P>> arrayElements = (List<Expression<L, R, P>>)variableExpression.getRightHandSide();
-                Expression<L, R, P> lhsElement = arrayElements.get(0);
+                VariableExpression variableExpression = (VariableExpression)processVariableDeclaration(iterativeStatementContext.variableDeclarationStatement());
+                List<Expression> arrayElements = (List<Expression>)variableExpression.getRightHandSide();
+                Expression lhsElement = arrayElements.get(0);
                 for(int i=1;i<arrayElements.size();i++){
-                    lhsElement = (Expression<L, R, P>)new ArithmeticExpression<>(ArithmeticOperator.ADDITION, lhsElement,arrayElements.get(i));
+                    lhsElement = new ArithmeticExpression(ArithmeticOperator.ADDITION, lhsElement,arrayElements.get(i));
                 }
                 return lhsElement;
             }
         } else if (null != iterativeStatementContext.EACH() && null != iterativeStatementContext.variableDeclarationStatement()) {
-            Expression<L, R, P> lhs = processVariableDeclaration(iterativeStatementContext.variableDeclarationStatement());
+            Expression lhs = processVariableDeclaration(iterativeStatementContext.variableDeclarationStatement());
         }
         return null;
     }
 
-    private Expression<L, R, P> buildArrayVariable(String variableName, BenefitParser.VariableInitializerContext variableInitializerContext) {
-        List<Expression<L, R, P>> arrayElements = new ArrayList<>();
+    private Expression buildArrayVariable(String variableName, BenefitParser.VariableInitializerContext variableInitializerContext) {
+        List<Expression> arrayElements = new ArrayList<>();
         List<BenefitParser.VariableInitializerContext> initializerContexts = variableInitializerContext.arrayInitializer().variableInitializer();
         for (BenefitParser.VariableInitializerContext initializerContext : initializerContexts) {
-            Expression<L, R, P> expression = processExpression(initializerContext.expression());
+            Expression expression = processExpression(initializerContext.expression());
             arrayElements.add(expression);
         }
-        return (Expression<L, R, P>) new VariableExpression<String, UnaryExpression<List<Expression<L, R, P>>>>(variableName, new UnaryExpression<List<Expression<L, R, P>>>(arrayElements));
+        return new VariableExpression(new UnaryExpression(variableName), new UnaryExpression(arrayElements));
     }
 
-    private Expression<L, R, P> buildNonArrayVariable(String variableName, BenefitParser.VariableInitializerContext variableInitializerContext) {
+    private Expression buildNonArrayVariable(String variableName, BenefitParser.VariableInitializerContext variableInitializerContext) {
         BenefitParser.ExpressionContext initializerContext = variableInitializerContext.expression();
-        Expression<L, R, P> unaryExpression = processExpression(initializerContext.expression());
-        return (Expression<L, R, P>) new VariableExpression<String, Expression<L, R, P>>(variableName, unaryExpression);
+        Expression unaryExpression = processExpression(initializerContext.expression());
+        return new VariableExpression(new UnaryExpression(variableName), unaryExpression);
     }
 
-    public Expression<L, R, P> processVariableDeclaration(BenefitParser.VariableDeclarationStatementContext variableDeclarationStatementContext) {
+    public Expression processVariableDeclaration(BenefitParser.VariableDeclarationStatementContext variableDeclarationStatementContext) {
         if (null != variableDeclarationStatementContext) {
             BenefitParser.VariableInitializerContext variableInitializerContext = variableDeclarationStatementContext.variableInitializer();
             if (null != variableDeclarationStatementContext.variableDeclaratorId()) {
@@ -198,22 +195,22 @@ public class ExpressionBuilder<L, R, P> {
     }
 
 
-    Expression<L, R, P> processAdditiveExpression(BenefitParser.AdditiveExpressionContext additiveExpressionContext) {
+    Expression processAdditiveExpression(BenefitParser.AdditiveExpressionContext additiveExpressionContext) {
         if (null != additiveExpressionContext.multiplicativeExpression(0)) {
-            Expression<L, R, P> lhs = processMultiplicationExpression(additiveExpressionContext.multiplicativeExpression(0));
+            Expression lhs = processMultiplicationExpression(additiveExpressionContext.multiplicativeExpression(0));
             if (null != additiveExpressionContext.ADD() &&
                     !additiveExpressionContext.ADD().isEmpty() &&
                     null != additiveExpressionContext.multiplicativeExpression() &&
                     !additiveExpressionContext.multiplicativeExpression().isEmpty()) {
                 for (BenefitParser.MultiplicativeExpressionContext multiplicativeExpressionContext : additiveExpressionContext.multiplicativeExpression()) {
-                    Expression<L, R, P> rhs = processMultiplicationExpression(multiplicativeExpressionContext);
+                    Expression rhs = processMultiplicationExpression(multiplicativeExpressionContext);
                 }
             } else if (null != additiveExpressionContext.SUB() &&
                     !additiveExpressionContext.SUB().isEmpty() &&
                     null != additiveExpressionContext.multiplicativeExpression() &&
                     !additiveExpressionContext.multiplicativeExpression().isEmpty()) {
                 for (BenefitParser.MultiplicativeExpressionContext multiplicativeExpressionContext : additiveExpressionContext.multiplicativeExpression()) {
-                    Expression<L, R, P> rhs = processMultiplicationExpression(multiplicativeExpressionContext);
+                    Expression rhs = processMultiplicationExpression(multiplicativeExpressionContext);
                 }
             }
 
@@ -221,55 +218,55 @@ public class ExpressionBuilder<L, R, P> {
         return null;
     }
 
-    Expression<L, R, P> processMultiplicationExpression(BenefitParser.MultiplicativeExpressionContext
+    Expression processMultiplicationExpression(BenefitParser.MultiplicativeExpressionContext
                                                                 multiplicativeExpressionContext) {
         if (null != multiplicativeExpressionContext.unaryExpression(0)) {
-            Expression<L, R, P> lhs = processUnaryExpression(multiplicativeExpressionContext.unaryExpression(0));
+            Expression lhs = processUnaryExpression(multiplicativeExpressionContext.unaryExpression(0));
             if (null != multiplicativeExpressionContext.MUL() &&
                     !multiplicativeExpressionContext.MUL().isEmpty() &&
                     null != multiplicativeExpressionContext.unaryExpression() &&
                     !multiplicativeExpressionContext.unaryExpression().isEmpty()) {
                 for (BenefitParser.UnaryExpressionContext unaryExpressionContext : multiplicativeExpressionContext.unaryExpression()) {
-                    Expression<L, R, P> rhs = processUnaryExpression(unaryExpressionContext);
+                    Expression rhs = processUnaryExpression(unaryExpressionContext);
                 }
             } else if (null != multiplicativeExpressionContext.DIV() &&
                     !multiplicativeExpressionContext.DIV().isEmpty() &&
                     null != multiplicativeExpressionContext.unaryExpression() &&
                     !multiplicativeExpressionContext.unaryExpression().isEmpty()) {
                 for (BenefitParser.UnaryExpressionContext unaryExpressionContext : multiplicativeExpressionContext.unaryExpression()) {
-                    Expression<L, R, P> rhs = processUnaryExpression(unaryExpressionContext);
+                    Expression rhs = processUnaryExpression(unaryExpressionContext);
                 }
             } else if (null != multiplicativeExpressionContext.MOD() &&
                     !multiplicativeExpressionContext.MOD().isEmpty() &&
                     null != multiplicativeExpressionContext.unaryExpression() &&
                     !multiplicativeExpressionContext.unaryExpression().isEmpty()) {
                 for (BenefitParser.UnaryExpressionContext unaryExpressionContext : multiplicativeExpressionContext.unaryExpression()) {
-                    Expression<L, R, P> rhs = processUnaryExpression(unaryExpressionContext);
+                    Expression rhs = processUnaryExpression(unaryExpressionContext);
                 }
             }
         }
         return null;
     }
 
-    Expression<L, R, P> processUnaryExpression(BenefitParser.UnaryExpressionContext unaryExpressionContext) {
+    Expression processUnaryExpression(BenefitParser.UnaryExpressionContext unaryExpressionContext) {
         BenefitParser.LiteralContext literalContext = unaryExpressionContext.primary().literal();
         if (null != literalContext) {
             if (null != literalContext.NUMBER()) {
                 Number literalNumericValue = Double.parseDouble(literalContext.NUMBER().getText());
-                UnaryExpression<Number> numericUnaryExpression = new UnaryExpression<Number>(literalNumericValue);
-                return (Expression<L, R, P>) numericUnaryExpression;
+                UnaryExpression numericUnaryExpression = new UnaryExpression(literalNumericValue);
+                return numericUnaryExpression;
             } else if (null != literalContext.StringLiteral()) {
                 String literalStringValue = literalContext.StringLiteral().getText();
-                UnaryExpression<String> stringUnaryExpression = new UnaryExpression<>(literalStringValue);
-                return (Expression<L, R, P>) stringUnaryExpression;
+                UnaryExpression stringUnaryExpression = new UnaryExpression(literalStringValue);
+                return stringUnaryExpression;
             } else if (null != literalContext.BooleanLiteral()) {
                 Boolean literalBooleanValue = Boolean.parseBoolean(literalContext.BooleanLiteral().getText());
-                UnaryExpression<Boolean> booleanUnaryExpression = new UnaryExpression<>(literalBooleanValue);
-                return (Expression<L, R, P>) booleanUnaryExpression;
+                UnaryExpression booleanUnaryExpression = new UnaryExpression(literalBooleanValue);
+                return booleanUnaryExpression;
             } else {
                 String literalStringValue = literalContext.NullLiteral().getText();
-                UnaryExpression<String> stringUnaryExpression = new UnaryExpression<>(literalStringValue);
-                return (Expression<L, R, P>) stringUnaryExpression;
+                UnaryExpression stringUnaryExpression = new UnaryExpression(literalStringValue);
+                return stringUnaryExpression;
             }
         } else if (null != unaryExpressionContext.primary().IDENTIFIER()) {
             return null;

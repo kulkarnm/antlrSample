@@ -5,7 +5,7 @@ import com.affaince.benefit.scheme.GivenUnit;
 
 
 public class GivenBlockBuilder<L, R, P> {
-    ExpressionBuilder<L,R,P> expressionBuilder = new ExpressionBuilder<>();
+    ExpressionBuilder expressionBuilder = new ExpressionBuilder();
     public GivenUnit buildGivenBlock(BenefitParser.GivenUnitContext ctx) {
         GivenUnit givenUnit = new GivenUnit();
         if (ctx.GIVEN().getText() == "given") {

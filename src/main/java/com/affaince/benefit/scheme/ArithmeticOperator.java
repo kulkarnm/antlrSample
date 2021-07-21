@@ -22,5 +22,8 @@ public enum ArithmeticOperator {
     TERNARY,
     ASSIGN,
     OR,
-    AND
+    AND,
+    STRCONCAT,
+    STRUPPERCASE,
+    STRLOWERCASE
 }
