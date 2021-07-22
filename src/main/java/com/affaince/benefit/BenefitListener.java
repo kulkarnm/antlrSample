@@ -280,6 +280,16 @@ public interface BenefitListener extends ParseTreeListener {
 	 */
 	void exitIterativeStatement(BenefitParser.IterativeStatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link BenefitParser#iterativeAggregationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterIterativeAggregationStatement(BenefitParser.IterativeAggregationStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BenefitParser#iterativeAggregationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitIterativeAggregationStatement(BenefitParser.IterativeAggregationStatementContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link BenefitParser#statement}.
 	 * @param ctx the parse tree
 	 */

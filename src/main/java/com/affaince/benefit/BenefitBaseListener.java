@@ -342,6 +342,18 @@ public class BenefitBaseListener implements BenefitListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterIterativeAggregationStatement(BenefitParser.IterativeAggregationStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIterativeAggregationStatement(BenefitParser.IterativeAggregationStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterStatement(BenefitParser.StatementContext ctx) { }
 	/**
 	 * {@inheritDoc}

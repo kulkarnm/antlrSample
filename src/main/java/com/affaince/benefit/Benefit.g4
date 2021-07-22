@@ -16,7 +16,7 @@ givenUnit
     ;
 
 givenBody
-    :   block
+    :   '{' variableDeclarationStatement* '}'
     ;
 
 
@@ -42,10 +42,9 @@ variableDeclarationStatement
     :   variableDeclaratorId
     |   variableDeclaratorId ASSIGN variableInitializer SEMI
     |   variableDeclaratorId ASINPUT SEMI
-    |   variableDeclaratorId ASSIGN statement
     ;
 variableDeclaratorId
-    :   IDENTIFIER ('[' ']')    //* is removed as we do not intend to support multidimensional arrays as of now
+    :   IDENTIFIER ('[' ']')?    //* is removed as we do not intend to support multidimensional arrays as of now
     ;
 
 variableInitializer
@@ -79,6 +78,7 @@ relationalExpression
 
 additiveExpression
     :   multiplicativeExpression ( (ADD | SUB) multiplicativeExpression )*
+    |   iterativeAggregationStatement
     ;
 
 multiplicativeExpression
@@ -124,12 +124,15 @@ literal
     |   'null'
     ;
 iterativeStatement
-    :   (SUMOF)? EACH (variableDeclarationStatement | statement)
+    :   EACH (variableDeclarationStatement | statement)
+    ;
+iterativeAggregationStatement
+    :   SUMOF EACH (variableDeclarationStatement | statement)
     ;
 statement
      :  block
      |  statementExpression SEMI
-     |  iterativeStatement
+     //|  iterativeStatement
      ;
 
 statementExpression
@@ -151,7 +154,7 @@ GIVEN
     ;
 
 ASINPUT
-    :   'as input'
+    :   ' as input'
     ;
 
 COMPUTE
@@ -159,11 +162,11 @@ COMPUTE
     ;
 
 EACH
-    :   'each'
+    :   'each '
     ;
 
 SUMOF
-    :   'sumOf'
+    :   'sumOf '
     ;
 
 ELIGIBLEWHEN

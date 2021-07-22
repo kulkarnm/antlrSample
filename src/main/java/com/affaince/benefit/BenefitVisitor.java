@@ -175,6 +175,12 @@ public interface BenefitVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIterativeStatement(BenefitParser.IterativeStatementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link BenefitParser#iterativeAggregationStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIterativeAggregationStatement(BenefitParser.IterativeAggregationStatementContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link BenefitParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
