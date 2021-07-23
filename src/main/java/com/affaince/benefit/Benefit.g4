@@ -50,6 +50,7 @@ variableDeclaratorId
 variableInitializer
     :   arrayInitializer
     |   expression
+    |
     ;
 
 arrayInitializer
@@ -78,7 +79,7 @@ relationalExpression
 
 additiveExpression
     :   multiplicativeExpression ( (ADD | SUB) multiplicativeExpression )*
-    |   iterativeAggregationStatement
+    |   iterativeAggregationExpression
     ;
 
 multiplicativeExpression
@@ -126,13 +127,12 @@ literal
 iterativeStatement
     :   EACH (variableDeclarationStatement | statement)
     ;
-iterativeAggregationStatement
-    :   SUMOF EACH (variableDeclarationStatement | statement)
+iterativeAggregationExpression
+    :   SUMOF EACH (variableDeclarationStatement | expression)
     ;
 statement
      :  block
      |  statementExpression SEMI
-     //|  iterativeStatement
      ;
 
 statementExpression

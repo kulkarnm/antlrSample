@@ -208,7 +208,7 @@ public class BenefitBaseVisitor<T> extends AbstractParseTreeVisitor<T> implement
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIterativeAggregationStatement(BenefitParser.IterativeAggregationStatementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIterativeAggregationExpression(BenefitParser.IterativeAggregationExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
