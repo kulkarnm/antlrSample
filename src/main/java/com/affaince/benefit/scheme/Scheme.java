@@ -5,6 +5,7 @@ public class Scheme {
     private ComputeUnit computeUnit;
     private EligibilityUnit eligibilityUnit;
     private PayUnit payUnit;
+    private CommonInputContext commonInputContext;
 
     public Scheme() {
     }

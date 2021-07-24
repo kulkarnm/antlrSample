@@ -125,7 +125,7 @@ literal
     |   'null'
     ;
 iterativeStatement
-    :   EACH (variableDeclarationStatement | statement)
+    :   EACH expression
     ;
 iterativeAggregationExpression
     :   SUMOF EACH (variableDeclarationStatement | expression)

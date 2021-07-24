@@ -10,9 +10,6 @@ public class ArithmeticExpression extends Expression {
         super(operator, leftHandSide, rightHandSide);
     }
 
-  /* protected Number obtainExpressionValue(Expression<L,R,Number> exp) {
-        return exp.apply();
-    }*/
 
     private Object executeBiFunction(BiFunction<Expression,Expression, ?> biFunction) {
         return biFunction.apply(getLeftHandSide(),getRightHandSide());
@@ -45,25 +42,23 @@ public class ArithmeticExpression extends Expression {
             case MODULUS:
                 BiFunction<Expression, Expression,?> mod = (a, b) -> ((Number)a.apply()).doubleValue() % ((Number)b.apply()).doubleValue();
                 return executeBiFunction(mod);
-          /*  case TERNARY:
-                BiFunction<Expression, Expression, Expression> ternary=null;
-                ArithmeticComparisonExpression<Expression<L,R,P>,Expression<L,R,P>,Q extends Boolean> conditionalExpression = (ArithmeticComparisonExpression<Expression<L,R,P>,Expression<L,R,P>,Q extends Boolean>)this.getPreExpression();
-                
-                ternary = (a, b) -> new UnaryExpression<>((Boolean)conditionalExpression.apply().apply() ? ((Number) a.apply()).doubleValue() : ((Number) b.apply()).doubleValue());
-              *//*  if(this.getLeftHandSide().apply() instanceof Number) {
+            case TERNARY:
+                ArithmeticComparisonExpression conditionalExpression = (ArithmeticComparisonExpression)this.getPreExpression();
+                BiFunction<Expression, Expression, ?> ternary = (a, b) -> new UnaryExpression((Boolean)conditionalExpression.apply() ? ((Number) a.apply()).doubleValue() : ((Number) b.apply()).doubleValue());
+                if(this.getLeftHandSide().apply() instanceof Number) {
                     if(this.getRightHandSide().apply() instanceof  Number) {
-                        ternary = (a, b) -> new UnaryExpression<>(conditionalExpression.apply().apply() ? ((Number) a.apply()).doubleValue() : ((Number) b.apply()).doubleValue());
+                        ternary = (a, b) -> (Boolean)conditionalExpression.apply() ? ((Number) a.apply()).doubleValue() : ((Number) b.apply()).doubleValue();
                     }else if( this.getRightHandSide().apply() instanceof ArithmeticExpression){
-                        ternary = (a, b) -> new UnaryExpression<>(conditionalExpression.apply().apply() ? ((Number) a.apply()).doubleValue() : ((ArithmeticExpression) b.apply()));
+                        ternary = (a, b) -> (Boolean)conditionalExpression.apply() ? ((Number) a.apply()).doubleValue() : ((ArithmeticExpression) b.apply());
                     }
                 }else if(this.getLeftHandSide().apply() instanceof ArithmeticExpression){
                     if(this.getRightHandSide().apply() instanceof  Number) {
-                        ternary = (a, b) -> new UnaryExpression<>(conditionalExpression.apply().apply() ? ((ArithmeticExpression) a.apply()) : ((Number) b.apply()).doubleValue());
+                        ternary = (a, b) -> (Boolean)conditionalExpression.apply() ? ((ArithmeticExpression) a.apply()) : ((Number) b.apply()).doubleValue();
                     }else if( this.getRightHandSide().apply() instanceof ArithmeticExpression){
-                        ternary = (a, b) -> new UnaryExpression<>(conditionalExpression.apply().apply() ? ((ArithmeticExpression) a.apply()) : ((ArithmeticExpression) b.apply()));
+                        ternary = (a, b) -> (Boolean)conditionalExpression.apply() ? ((ArithmeticExpression) a.apply()) : ((ArithmeticExpression) b.apply());
                     }
-                }*//*
-                return (P) executeBiFunction(ternary);*/
+                }
+                return executeBiFunction(ternary);
 
             default:
                 throw new IllegalStateException("Unexpected value: " + this.getOperator());

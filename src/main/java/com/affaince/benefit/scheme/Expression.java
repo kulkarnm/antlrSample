@@ -6,16 +6,14 @@ public abstract class Expression {
     private Expression leftHandSide;
     private Expression rightHandSide;
     private Expression preExpression; //just for ternary
-    private Object value;
+
 
     public Expression(ArithmeticOperator operator, Expression leftHandSide, Expression rightHandSide) {
         this.operator = operator;
         this.leftHandSide = leftHandSide;
         this.rightHandSide = rightHandSide;
     }
-    public Expression(Object value){
-        this.value=value;
-    }
+
     public ArithmeticOperator getOperator() {
         return operator;
     }
@@ -36,9 +34,7 @@ public abstract class Expression {
         return rightHandSide;
     }
 
-    public Object getValue() {
-        return value;
-    }
+
 
     public abstract Object apply();
 
