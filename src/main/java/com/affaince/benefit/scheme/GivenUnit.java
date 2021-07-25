@@ -13,6 +13,10 @@ public class GivenUnit {
         this.expressionQueue.add(expression);
     }
 
+    public LinkedList<Expression> getExpressionQueue() {
+        return expressionQueue;
+    }
+
     public Expression viewNextExpression(){
         return expressionQueue.peek();
     }
