@@ -55,6 +55,24 @@ public interface BenefitVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPayUnit(BenefitParser.PayUnitContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link BenefitParser#payBefore}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPayBefore(BenefitParser.PayBeforeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link BenefitParser#payAfter}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPayAfter(BenefitParser.PayAfterContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link BenefitParser#payMultiplier}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPayMultiplier(BenefitParser.PayMultiplierContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link BenefitParser#variableDeclarationStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -132,6 +150,24 @@ public interface BenefitVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPrimary(BenefitParser.PrimaryContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link BenefitParser#variableName}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVariableName(BenefitParser.VariableNameContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link BenefitParser#connectorAnd}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConnectorAnd(BenefitParser.ConnectorAndContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link BenefitParser#connectorOr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConnectorOr(BenefitParser.ConnectorOrContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link BenefitParser#parExpression}.
 	 * @param ctx the parse tree

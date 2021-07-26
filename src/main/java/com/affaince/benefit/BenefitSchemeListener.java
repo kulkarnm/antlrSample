@@ -2,6 +2,8 @@ package com.affaince.benefit;
 
 import com.affaince.benefit.scheme.*;
 
+import java.util.List;
+
 public class BenefitSchemeListener extends BenefitBaseListener{
     private Scheme scheme;
     private ExpressionBuilder expressionBuilder;
@@ -16,10 +18,17 @@ public class BenefitSchemeListener extends BenefitBaseListener{
     }
 
     @Override public void exitVariableDeclarationStatement(BenefitParser.VariableDeclarationStatementContext ctx) {
-        if(ctx.getParent() instanceof BenefitParser.GivenUnitContext){
-          VariableExpression variableExpression = (VariableExpression)expressionBuilder.processVariableDeclaration(ctx);
-          scheme.getGivenUnit().addExpression(variableExpression);
-        }
+        scheme.getGivenUnit().addExpression(expressionBuilder.processVariableDeclaration(ctx));
+        System.out.println(" exit variable declaration statement");
+
+    }
+
+    @Override
+    public void exitComputeBlock(BenefitParser.ComputeBlockContext ctx) {
+       List<BenefitParser.BlockStatementContext> blockStatementContexts =ctx.block().blockStatement();
+       for(BenefitParser.BlockStatementContext blockStatementContext:blockStatementContexts){
+           scheme.getComputeUnit().addExpression(expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression()));
+       }
     }
 
     @Override public void enterComputeUnit(BenefitParser.ComputeUnitContext ctx) {
@@ -27,9 +36,16 @@ public class BenefitSchemeListener extends BenefitBaseListener{
         this.scheme.setComputeUnit(computeUnit);
     }
 
+
     @Override public void enterEligibilityUnit(BenefitParser.EligibilityUnitContext ctx) {
         EligibilityUnit eligibilityUnit= new EligibilityUnit();
         this.scheme.setEligibilityUnit(eligibilityUnit);
+    }
+    @Override public void exitEligibilityUnit(BenefitParser.EligibilityUnitContext ctx) {
+        List<BenefitParser.BlockStatementContext> blockStatementContexts =ctx.block().blockStatement();
+        for(BenefitParser.BlockStatementContext blockStatementContext:blockStatementContexts){
+            scheme.getEligibilityUnit().addExpression(expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression()));
+        }
     }
     @Override public void enterPayUnit(BenefitParser.PayUnitContext ctx) {
         PayUnit payUnit=new PayUnit();
@@ -38,14 +54,6 @@ public class BenefitSchemeListener extends BenefitBaseListener{
 
 
     @Override public void exitExpression(BenefitParser.ExpressionContext ctx) {
-        Expression expression = expressionBuilder.buildExpression(ctx);
-        if(ctx.getParent() instanceof BenefitParser.ComputeUnitContext){
-            this.scheme.getComputeUnit().addExpression(expression);
-        }else if(ctx.getParent() instanceof BenefitParser.EligibilityUnitContext){
-            this.scheme.getEligibilityUnit().addExpression(expression);
-        }else{
-            this.scheme.getPayUnit().addExpression(expression);
-        }
     }
 
     public Scheme getScheme() {

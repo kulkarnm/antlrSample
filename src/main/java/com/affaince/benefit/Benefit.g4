@@ -34,17 +34,27 @@ eligibilityUnit
    ;
 
 payUnit
-   :    PAY IDENTIFIER (BEFORE | AFTER) expressionList OF IDENTIFIER proportionExpression SEMI
+   :    PAY variableName (payBefore | payAfter) expressionList payMultiplier variableName proportionExpression SEMI
    ;
 
+payBefore
+    :   BEFORE
+    ;
 
+payAfter
+    :   AFTER
+    ;
+
+payMultiplier
+    :   OF
+    ;
 variableDeclarationStatement
     :   variableDeclaratorId
     |   variableDeclaratorId ASSIGN variableInitializer SEMI
     |   variableDeclaratorId ASINPUT SEMI
     ;
 variableDeclaratorId
-    :   IDENTIFIER ('[' ']')?    //* is removed as we do not intend to support multidimensional arrays as of now
+    :   variableName ('[' ']')?    //* is removed as we do not intend to support multidimensional arrays as of now
     ;
 
 variableInitializer
@@ -63,11 +73,11 @@ conditionalExpression
     ;
 
 conditionalOrExpression
-    :   conditionalAndExpression ( ORSTR conditionalAndExpression )*
+    :   conditionalAndExpression ( connectorOr conditionalAndExpression )*
     ;
 
 conditionalAndExpression
-    :   relationalExpression ( ANDSTR relationalExpression )*
+    :   relationalExpression ( connectorAnd relationalExpression )*
     ;
 relationalOp
     :   GT | GE | LE | LT | EQUAL | NOTEQUAL
@@ -95,9 +105,18 @@ unaryExpression
 primary
     :   parExpression
     |   literal
-    |   IDENTIFIER
+    |   variableName
     ;
 
+variableName
+    :   IDENTIFIER
+    ;
+connectorAnd
+    :   ANDSTR
+    ;
+connectorOr
+    :   ORSTR
+    ;
 parExpression
     :   LPAREN expression RPAREN
     ;
@@ -132,7 +151,7 @@ iterativeAggregationExpression
     ;
 statement
      :  block
-     |  statementExpression SEMI
+     |  statementExpression (SEMI)?
      ;
 
 statementExpression
@@ -141,6 +160,8 @@ statementExpression
 block
     :  '{' blockStatement* '}'
     ;
+
+
 blockStatement
     :   statement
     |   variableDeclarationStatement
@@ -219,7 +240,7 @@ NullLiteral
 	;
 //end -keywords
 IDENTIFIER
-    :   [A-Za-z]+[0-9]*('_'[A-Za-z]+[0-9]*)*
+    :   SchemeLetter SchemeLetterOrDigit*
     ;
 
 
@@ -289,6 +310,14 @@ EscapeSequence
 	:	'\\' [btnfr"'\\]
 	;
 
+fragment
+SchemeLetter
+	:	[a-zA-Z$_]
+	;
+fragment
+SchemeLetterOrDigit
+	:	[a-zA-Z0-9$_]
+	;
 WS  :  [ \t\r\n\u000C]+ -> skip
     ;
 

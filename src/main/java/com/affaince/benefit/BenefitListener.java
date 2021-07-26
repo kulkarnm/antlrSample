@@ -80,6 +80,36 @@ public interface BenefitListener extends ParseTreeListener {
 	 */
 	void exitPayUnit(BenefitParser.PayUnitContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link BenefitParser#payBefore}.
+	 * @param ctx the parse tree
+	 */
+	void enterPayBefore(BenefitParser.PayBeforeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BenefitParser#payBefore}.
+	 * @param ctx the parse tree
+	 */
+	void exitPayBefore(BenefitParser.PayBeforeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BenefitParser#payAfter}.
+	 * @param ctx the parse tree
+	 */
+	void enterPayAfter(BenefitParser.PayAfterContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BenefitParser#payAfter}.
+	 * @param ctx the parse tree
+	 */
+	void exitPayAfter(BenefitParser.PayAfterContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BenefitParser#payMultiplier}.
+	 * @param ctx the parse tree
+	 */
+	void enterPayMultiplier(BenefitParser.PayMultiplierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BenefitParser#payMultiplier}.
+	 * @param ctx the parse tree
+	 */
+	void exitPayMultiplier(BenefitParser.PayMultiplierContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link BenefitParser#variableDeclarationStatement}.
 	 * @param ctx the parse tree
 	 */
@@ -209,6 +239,36 @@ public interface BenefitListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPrimary(BenefitParser.PrimaryContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BenefitParser#variableName}.
+	 * @param ctx the parse tree
+	 */
+	void enterVariableName(BenefitParser.VariableNameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BenefitParser#variableName}.
+	 * @param ctx the parse tree
+	 */
+	void exitVariableName(BenefitParser.VariableNameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BenefitParser#connectorAnd}.
+	 * @param ctx the parse tree
+	 */
+	void enterConnectorAnd(BenefitParser.ConnectorAndContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BenefitParser#connectorAnd}.
+	 * @param ctx the parse tree
+	 */
+	void exitConnectorAnd(BenefitParser.ConnectorAndContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BenefitParser#connectorOr}.
+	 * @param ctx the parse tree
+	 */
+	void enterConnectorOr(BenefitParser.ConnectorOrContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BenefitParser#connectorOr}.
+	 * @param ctx the parse tree
+	 */
+	void exitConnectorOr(BenefitParser.ConnectorOrContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link BenefitParser#parExpression}.
 	 * @param ctx the parse tree
