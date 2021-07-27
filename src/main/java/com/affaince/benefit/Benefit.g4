@@ -139,6 +139,7 @@ expression
 
 literal
     :   NUMBER
+    |   CharacterLiteral
     |   StringLiteral
     |   BooleanLiteral
     |   'null'
@@ -230,18 +231,13 @@ ORSTR
     :   'or'
     ;
 
-BooleanLiteral
-	:	'true'
-	|	'false'
-	;
+
 
 NullLiteral
 	:	'null'
 	;
 //end -keywords
-IDENTIFIER
-    :   SchemeLetter SchemeLetterOrDigit*
-    ;
+
 
 
 NUMBER
@@ -282,6 +278,10 @@ fragment
 Sign
 	:	[+\-]
 	;
+BooleanLiteral
+	:	'true'
+	|	'false'
+	;
 CharacterLiteral
 	:	'\'' SingleCharacter '\''
 	|	'\'' EscapeSequence '\''
@@ -309,7 +309,10 @@ fragment
 EscapeSequence
 	:	'\\' [btnfr"'\\]
 	;
-
+//Identifiers (must appear after all keywords in the grammar)
+IDENTIFIER
+    :   SchemeLetter SchemeLetterOrDigit*
+    ;
 fragment
 SchemeLetter
 	:	[a-zA-Z$_]
