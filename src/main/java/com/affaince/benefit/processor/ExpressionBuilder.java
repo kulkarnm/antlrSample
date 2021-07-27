@@ -1,5 +1,6 @@
-package com.affaince.benefit;
+package com.affaince.benefit.processor;
 
+import com.affaince.benefit.BenefitParser;
 import com.affaince.benefit.scheme.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
 

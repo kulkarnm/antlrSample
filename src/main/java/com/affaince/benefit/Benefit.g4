@@ -16,7 +16,7 @@ givenUnit
     ;
 
 givenBody
-    :   '{' variableDeclarationStatement* '}'
+    :   variableDeclarationStatement*
     ;
 
 
@@ -150,15 +150,15 @@ iterativeAggregationExpression
     :   SUMOF EACH (variableDeclarationStatement | expression)
     ;
 statement
-     :  block
-     |  statementExpression (SEMI)?
+     :  statementExpression (SEMI)?                       //block
+     //|  statementExpression (SEMI)?
      ;
 
 statementExpression
     :   expression
     ;
 block
-    :  '{' blockStatement* '}'
+    :  blockStatement*
     ;
 
 

@@ -1,10 +1,12 @@
-package com.affaince.benefit;
+package com.affaince.benefit.processor;
 
+import com.affaince.benefit.BenefitBaseListener;
+import com.affaince.benefit.BenefitParser;
 import com.affaince.benefit.scheme.*;
 
 import java.util.List;
 
-public class BenefitSchemeListener extends BenefitBaseListener{
+public class BenefitSchemeListener extends BenefitBaseListener {
     private Scheme scheme;
     private ExpressionBuilder expressionBuilder;
     @Override public void enterScheme(BenefitParser.SchemeContext ctx) {
