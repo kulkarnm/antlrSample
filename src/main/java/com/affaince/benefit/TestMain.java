@@ -41,24 +41,21 @@ public class TestMain {
     }
 
     public static void execute(){
-        String str = "given {\n" +
+        String str = "given \n" +
                 "\t UNIT_SUBSCRIPTION_VALUE = 1000 ;\n" +
                 "\t UNIT_PERIOD_MONTH = 2 ;\n" +
                 "\t VALUE_PER_POINT = 1 ;\n" +
                 "\t SUBSCRIPTION_VALUE as input ;\n" +
                 "\t SUBSCRIPTION_PERIOD as input ;\n" +
-                "\t }\n" +
-                "\t compute {\n" +
+                "\t compute \n" +
                 "\t RESULT1= SUBSCRIPTION_VALUE / UNIT_SUBSCRIPTION_VALUE ;\n" +
                 "\t RESULT2= SUBSCRIPTION_PERIOD / UNIT_PERIOD_MONTH ;\n" +
                 "\t BENEFIT_COUNT = RESULT1*RESULT2 ;\n" +
                 "\t BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT ;\n" +
-                "\t }\n" +
-                "\t eligibleWhen	{\n" +
+                "\t eligibleWhen	\n" +
                 "\t SUBSCRIPTION_VALUE > 20000 and\n" +
                 "\t SUBSCRIPTION_VALUE < 30000 and\n" +
                 "\t SUBSCRIPTION_PERIOD >= 10 ;\n" +
-                "\t }\n" +
                 "\t pay BENEFIT_VALUE\n" +
                 "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;";
 

@@ -54,7 +54,10 @@ public class BenefitSchemeListener extends BenefitBaseListener {
         this.scheme.setPayUnit(payUnit);
     }
 
-
+    @Override public void exitPayUnit(BenefitParser.PayUnitContext ctx) {
+       PaymentExpressionBuilder paymentExpressionBuilder = new PaymentExpressionBuilder();
+       this.scheme.getPayUnit().setPaymentExpression(paymentExpressionBuilder.buildPaymentExpression(ctx,this.scheme));
+    }
     @Override public void exitExpression(BenefitParser.ExpressionContext ctx) {
     }
 

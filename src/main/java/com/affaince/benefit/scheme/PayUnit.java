@@ -3,20 +3,16 @@ package com.affaince.benefit.scheme;
 import java.util.LinkedList;
 
 public class PayUnit {
-    private LinkedList<Expression> expressionQueue;
+    private PaymentExpression paymentExpression;
 
     public PayUnit() {
-        this.expressionQueue = new LinkedList<>();
     }
 
-    public void addExpression(Expression expression){
-        this.expressionQueue.add(expression);
+    public void setPaymentExpression(PaymentExpression paymentExpression) {
+        this.paymentExpression = paymentExpression;
     }
 
-    public Expression viewNextExpression(){
-        return expressionQueue.peek();
-    }
-    public Expression getNextExpression(){
-        return expressionQueue.poll();
+    public PaymentExpression getPaymentExpression() {
+        return paymentExpression;
     }
 }

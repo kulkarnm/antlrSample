@@ -6,12 +6,13 @@ import java.util.List;
 public class PaymentExpression {
     private Expression payableVariable;
     private PaymentPrecedence precedence;
-    List<Expression> vestingExpressions;
-    List<Expression> proportionExpressions;
+    List<Expression> vestingPeriodicityExpressions;
+    private Expression multiplierVariable;
+    List<Expression> vestingDistributionExpressions;
 
     public PaymentExpression(){
-        vestingExpressions = new ArrayList<>();
-        proportionExpressions = new ArrayList<>();
+        vestingPeriodicityExpressions = new ArrayList<>();
+        vestingDistributionExpressions = new ArrayList<>();
     }
 
     public Expression getPayableVariable() {
@@ -22,12 +23,12 @@ public class PaymentExpression {
         return precedence;
     }
 
-    public List<Expression> getVestingExpressions() {
-        return vestingExpressions;
+    public List<Expression> getVestingPeriodicityExpressions() {
+        return vestingPeriodicityExpressions;
     }
 
-    public List<Expression> getProportionExpressions() {
-        return proportionExpressions;
+    public List<Expression> getVestingDistributionExpressions() {
+        return vestingDistributionExpressions;
     }
 
     public void setPayableVariable(Expression payableVariable) {
@@ -39,17 +40,25 @@ public class PaymentExpression {
     }
 
     public void addToVestingExpression(Expression expression){
-        this.vestingExpressions.add(expression);
+        this.vestingPeriodicityExpressions.add(expression);
     }
     public void addToProportionExpression(Expression expression){
-        this.proportionExpressions.add(expression);
+        this.vestingDistributionExpressions.add(expression);
     }
 
-    public void setVestingExpressions(List<Expression> vestingExpressions) {
-        this.vestingExpressions = vestingExpressions;
+    public void setVestingPeriodicityExpressions(List<Expression> vestingPeriodicityExpressions) {
+        this.vestingPeriodicityExpressions = vestingPeriodicityExpressions;
     }
 
-    public void setProportionExpressions(List<Expression> proportionExpressions) {
-        this.proportionExpressions = proportionExpressions;
+    public void setVestingDistributionExpressions(List<Expression> vestingDistributionExpressions) {
+        this.vestingDistributionExpressions = vestingDistributionExpressions;
+    }
+
+    public Expression getMultiplierVariable() {
+        return multiplierVariable;
+    }
+
+    public void setMultiplierVariable(Expression multiplierVariable) {
+        this.multiplierVariable = multiplierVariable;
     }
 }
