@@ -19,4 +19,12 @@ public class ComputeUnit {
     public Expression getNextExpression(){
         return expressionQueue.poll();
     }
+
+    public void execute(BenefitSchemeContext benefitSchemeContext){
+        for(Expression expression: expressionQueue){
+            String variableName = (String)expression.getLeftHandSide().apply();
+            Object variableValue = expression.apply();
+            benefitSchemeContext.addToInputVariables(variableName,variableValue);
+        }
+    }
 }

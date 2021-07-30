@@ -5,7 +5,9 @@ import com.affaince.benefit.scheme.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PaymentExpressionBuilder {
     private ExpressionBuilder expressionBuilder;
@@ -48,28 +50,29 @@ public class PaymentExpressionBuilder {
         return new UnaryExpression(payUnitContext.variableName().get(1));
     }
 
-    private List<Expression> buildVestingDistributionExpressions(BenefitParser.PayUnitContext payUnitContext, PaymentExpression paymentExpression) {
+    private Map<Expression,Expression> buildVestingDistributionExpressions(BenefitParser.PayUnitContext payUnitContext, PaymentExpression paymentExpression) {
         BenefitParser.ProportionExpressionContext proportionExpressionContext = payUnitContext.proportionExpression();
         int vestingCount = paymentExpression.getVestingPeriodicityExpressions().size();
-        List<Expression> distributionExpressions = new ArrayList<>();
+        Map<Expression,Expression> deliveryWiseDistributionExpressions = new HashMap<>();
         if (null != proportionExpressionContext.DEFAULT()) {
-            for (int i = 1; i <= vestingCount; i++) {
+            for (int i =0; i < vestingCount; i++) {
+                Expression vestingPeriodicityExpression = paymentExpression.getVestingPeriodicityExpressions().get(i);
                 Expression expression = new ArithmeticExpression(ArithmeticOperator.MULTIPLICATION,
                         new ArithmeticExpression(ArithmeticOperator.DIVISION, new UnaryExpression(1), new UnaryExpression(vestingCount)),
                         paymentExpression.getPayableVariable());
-                distributionExpressions.add(expression);
+                deliveryWiseDistributionExpressions.put(vestingPeriodicityExpression,expression);
             }
         } else {
             List<TerminalNode> proportionNumbers = payUnitContext.proportionExpression().nonDefaultProportionExpression().NUMBER();
-
             int proportionSum = proportionNumbers.stream().map(token ->Integer.parseInt(token.getText())).reduce(Integer::sum).get();
-            for (int i = 1; i <= vestingCount; i++) {
+            for (int i = 0; i < vestingCount; i++) {
+                Expression vestingPeriodicityExpression = paymentExpression.getVestingPeriodicityExpressions().get(i);
                 Expression expression = new ArithmeticExpression(ArithmeticOperator.MULTIPLICATION,
-                        new ArithmeticExpression(ArithmeticOperator.DIVISION, new UnaryExpression(Integer.parseInt(proportionNumbers.get(i-1).getText())), new UnaryExpression(proportionSum)),
+                        new ArithmeticExpression(ArithmeticOperator.DIVISION, new UnaryExpression(Integer.parseInt(proportionNumbers.get(i).getText())), new UnaryExpression(proportionSum)),
                         paymentExpression.getPayableVariable());
-                distributionExpressions.add(expression);
+                deliveryWiseDistributionExpressions.put(vestingPeriodicityExpression,expression);
             }
         }
-        return distributionExpressions;
+        return deliveryWiseDistributionExpressions;
     }
 }

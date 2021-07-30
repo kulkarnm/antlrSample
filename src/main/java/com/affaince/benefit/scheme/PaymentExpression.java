@@ -1,18 +1,20 @@
 package com.affaince.benefit.scheme;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PaymentExpression {
     private Expression payableVariable;
     private PaymentPrecedence precedence;
     List<Expression> vestingPeriodicityExpressions;
     private Expression multiplierVariable;
-    List<Expression> vestingDistributionExpressions;
+    Map<Expression,Expression> vestingDistributionExpressions;
 
     public PaymentExpression(){
         vestingPeriodicityExpressions = new ArrayList<>();
-        vestingDistributionExpressions = new ArrayList<>();
+        vestingDistributionExpressions = new HashMap<>();
     }
 
     public Expression getPayableVariable() {
@@ -27,7 +29,7 @@ public class PaymentExpression {
         return vestingPeriodicityExpressions;
     }
 
-    public List<Expression> getVestingDistributionExpressions() {
+    public Map<Expression,Expression> getVestingDistributionExpressions() {
         return vestingDistributionExpressions;
     }
 
@@ -42,15 +44,12 @@ public class PaymentExpression {
     public void addToVestingExpression(Expression expression){
         this.vestingPeriodicityExpressions.add(expression);
     }
-    public void addToProportionExpression(Expression expression){
-        this.vestingDistributionExpressions.add(expression);
-    }
 
     public void setVestingPeriodicityExpressions(List<Expression> vestingPeriodicityExpressions) {
         this.vestingPeriodicityExpressions = vestingPeriodicityExpressions;
     }
 
-    public void setVestingDistributionExpressions(List<Expression> vestingDistributionExpressions) {
+    public void setVestingDistributionExpressions(Map<Expression,Expression> vestingDistributionExpressions) {
         this.vestingDistributionExpressions = vestingDistributionExpressions;
     }
 

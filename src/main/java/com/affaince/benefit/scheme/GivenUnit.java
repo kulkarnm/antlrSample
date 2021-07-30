@@ -23,4 +23,12 @@ public class GivenUnit {
     public Expression getNextExpression(){
         return expressionQueue.poll();
     }
+
+    public void execute(BenefitSchemeContext benefitSchemeContext){
+        for(Expression expression: expressionQueue){
+            benefitSchemeContext.addToInputVariables((String)expression.getLeftHandSide().apply(),expression.apply());
+        }
+    }
+
+
 }
