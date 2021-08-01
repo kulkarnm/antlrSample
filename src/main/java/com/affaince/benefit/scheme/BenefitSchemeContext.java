@@ -41,6 +41,9 @@ public class BenefitSchemeContext {
     public void setBenefitValue(Double benefitValue){
         benefitOutputContext.setBenefitValue(benefitValue);
     }
+    public Object searchVariableValue(String variableName){
+        return benefitInputContext.searchVariableValue(variableName);
+    }
     private class BenefitInputContext{
         private Map<String,Object> inputVariables;
 
@@ -58,6 +61,9 @@ public class BenefitSchemeContext {
 
         public void addToInputVariables(String variableName,Object value){
             inputVariables.put(variableName,value);
+        }
+        public Object searchVariableValue(String variableName){
+            return inputVariables.entrySet().stream().filter(var->var.getKey().equals(variableName)).findAny().get().getValue();
         }
     }
     private class BenefitOutputContext{

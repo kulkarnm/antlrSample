@@ -11,8 +11,13 @@ import java.util.Map;
 
 public class PaymentExpressionBuilder {
     private ExpressionBuilder expressionBuilder;
+    private Scheme scheme;
 
-    public PaymentExpression buildPaymentExpression(BenefitParser.PayUnitContext payUnitContext,Scheme scheme) {
+    public PaymentExpressionBuilder(Scheme scheme){
+        this.scheme=scheme;
+    }
+
+    public PaymentExpression buildPaymentExpression(BenefitParser.PayUnitContext payUnitContext) {
         expressionBuilder = new ExpressionBuilder(scheme);
         PaymentExpression paymentExpression = new PaymentExpression();
         paymentExpression.setPayableVariable(buildPayableVariableExpression(payUnitContext));
@@ -24,7 +29,7 @@ public class PaymentExpressionBuilder {
     }
 
     private Expression buildPayableVariableExpression(BenefitParser.PayUnitContext payUnitContext) {
-        return new VariableIdentifierExpression(payUnitContext.variableName().get(0).getText());
+        return scheme.searchVariableExpression(payUnitContext.variableName().get(0).getText());
     }
 
     private PaymentPrecedence buildPaymentPrecedence(BenefitParser.PayUnitContext payUnitContext) {
@@ -47,7 +52,7 @@ public class PaymentExpressionBuilder {
     }
 
     private Expression buildMultiplierVariable(BenefitParser.PayUnitContext payUnitContext) {
-        return new VariableIdentifierExpression(payUnitContext.variableName().get(1).getText());
+        return scheme.searchVariableExpression(payUnitContext.variableName().get(1).getText());
     }
 
     private Map<Expression,Expression> buildVestingDistributionExpressions(BenefitParser.PayUnitContext payUnitContext, PaymentExpression paymentExpression) {

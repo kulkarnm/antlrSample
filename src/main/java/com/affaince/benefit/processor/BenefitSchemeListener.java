@@ -9,11 +9,13 @@ import java.util.List;
 public class BenefitSchemeListener extends BenefitBaseListener {
     private Scheme scheme;
     private ExpressionBuilder expressionBuilder;
+    private PaymentExpressionBuilder paymentExpressionBuilder;
     public BenefitSchemeListener(Scheme scheme){
         this.scheme = scheme;
     }
     @Override public void enterScheme(BenefitParser.SchemeContext ctx) {
         expressionBuilder = new ExpressionBuilder(this.scheme);
+        paymentExpressionBuilder= new PaymentExpressionBuilder(scheme);
     }
 
     @Override
@@ -44,8 +46,7 @@ public class BenefitSchemeListener extends BenefitBaseListener {
     }
 
     @Override public void exitPayUnit(BenefitParser.PayUnitContext ctx) {
-       PaymentExpressionBuilder paymentExpressionBuilder = new PaymentExpressionBuilder();
-       this.scheme.getPayUnit().setPaymentExpression(paymentExpressionBuilder.buildPaymentExpression(ctx,this.scheme));
+       this.scheme.getPayUnit().setPaymentExpression(paymentExpressionBuilder.buildPaymentExpression(ctx));
         System.out.println("exit payment unit");
     }
 

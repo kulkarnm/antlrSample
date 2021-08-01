@@ -10,12 +10,9 @@ public class ArithmeticExpression extends Expression {
         super(operator, leftHandSide, rightHandSide);
     }
 
-
     private Object executeBiFunction(BiFunction<Expression,Expression, ?> biFunction) {
         return biFunction.apply(getLeftHandSide(),getRightHandSide());
     }
-
-
 
     private Object executeFunction(Function<Expression,?> function) {
         return function.apply(getLeftHandSide());

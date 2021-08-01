@@ -34,7 +34,13 @@ public abstract class Expression {
         return rightHandSide;
     }
 
+    public void setLeftHandSide(Expression leftHandSide) {
+        this.leftHandSide = leftHandSide;
+    }
 
+    public void setRightHandSide(Expression rightHandSide) {
+        this.rightHandSide = rightHandSide;
+    }
 
     public abstract Object apply();
 

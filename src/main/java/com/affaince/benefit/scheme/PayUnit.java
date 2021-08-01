@@ -24,6 +24,7 @@ public class PayUnit {
     }
 
     public void execute(BenefitSchemeContext benefitSchemeContext){
+
          String payableVariableName = (String)paymentExpression.getPayableVariable().getLeftHandSide().apply();
          Object value = paymentExpression.getPayableVariable().apply();
          benefitSchemeContext.setBenefitValue((Double)value);
