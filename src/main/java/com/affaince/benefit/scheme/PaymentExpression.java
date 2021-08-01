@@ -17,6 +17,18 @@ public class PaymentExpression {
         vestingDistributionExpressions = new HashMap<>();
     }
 
+    public Expression searchVariableExpression(String variableName) {
+        String payableVariableName = (String)payableVariable.apply();
+        if(variableName.equals(payableVariableName)){
+            return payableVariable;
+        }else {
+            String multiplierVariableName = (String) getMultiplierVariable().apply();
+            if(variableName.equals(multiplierVariableName)){
+                return multiplierVariable;
+            }
+        }
+        return null;
+    }
     public Expression getPayableVariable() {
         return payableVariable;
     }

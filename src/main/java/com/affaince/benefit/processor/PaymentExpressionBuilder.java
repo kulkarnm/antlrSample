@@ -24,7 +24,7 @@ public class PaymentExpressionBuilder {
     }
 
     private Expression buildPayableVariableExpression(BenefitParser.PayUnitContext payUnitContext) {
-        return new UnaryExpression(payUnitContext.variableName().get(0));
+        return new VariableIdentifierExpression(payUnitContext.variableName().get(0).getText());
     }
 
     private PaymentPrecedence buildPaymentPrecedence(BenefitParser.PayUnitContext payUnitContext) {
@@ -47,7 +47,7 @@ public class PaymentExpressionBuilder {
     }
 
     private Expression buildMultiplierVariable(BenefitParser.PayUnitContext payUnitContext) {
-        return new UnaryExpression(payUnitContext.variableName().get(1));
+        return new VariableIdentifierExpression(payUnitContext.variableName().get(1).getText());
     }
 
     private Map<Expression,Expression> buildVestingDistributionExpressions(BenefitParser.PayUnitContext payUnitContext, PaymentExpression paymentExpression) {

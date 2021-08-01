@@ -8,8 +8,29 @@ public class Scheme {
     private CommonInputContext commonInputContext;
 
     public Scheme() {
+        givenUnit = new GivenUnit();
+        computeUnit = new ComputeUnit();
+        eligibilityUnit= new EligibilityUnit();
+        payUnit=new PayUnit();
     }
 
+    public Expression searchVariableExpression(String variableName){
+        Expression expression = this.getGivenUnit().searchVariableExpression(variableName);
+        if(null !=expression){
+            return expression;
+        }else{
+            expression = this.getComputeUnit().searchVariableExpression(variableName);
+            if(null != expression){
+                return expression;
+            }else{
+                expression = this.getPayUnit().searchVariableExpression(variableName);
+                if(null != expression) {
+                    return expression;
+                }
+            }
+        }
+        return null;
+    }
     public GivenUnit getGivenUnit() {
         return givenUnit;
     }

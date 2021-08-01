@@ -145,16 +145,16 @@ public class ExpressionBuilder {
                 //LHS : in case of EACH lhs is always a variable who is an array;
                 BenefitParser.PrimaryContext lhsPrimaryContext = additiveExpressionContexts.get(0).multiplicativeExpression(0).unaryExpression(0).primary();
                 String lhsCollectionVariableName = lhsPrimaryContext.variableName().getText();
-                Expression lhsVariableExpression = searchVariableExpressionInGivenUnit(lhsCollectionVariableName);
+                Expression lhsVariableExpression = scheme.searchVariableExpression(lhsCollectionVariableName);
 
-                //RELATIONALOP : in case of each only one relationalOp
+                //RELATIONAL OP : in case of each only one relationalOp
                 BenefitParser.RelationalOpContext relationalOpContext = relationalExpressionContext.relationalOp(0);
 
                 //RHS: Single primary value or variable Name
                 BenefitParser.PrimaryContext rhsPrimaryContext = additiveExpressionContexts.get(1).multiplicativeExpression(0).unaryExpression(0).primary();
                 if (null != rhsPrimaryContext.variableName()) {
                     String rhsVariableName = lhsPrimaryContext.variableName().getText();
-                    Expression rhsVariableExpression = searchVariableExpressionInGivenUnit(rhsVariableName);
+                    Expression rhsVariableExpression = scheme.searchVariableExpression(rhsVariableName);
                     return new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOpContext), lhsVariableExpression, rhsVariableExpression);
                 } else if (null != rhsPrimaryContext.literal()) {
                     Integer value = Integer.parseInt(rhsPrimaryContext.literal().NUMBER().getText());
@@ -166,16 +166,6 @@ public class ExpressionBuilder {
         return null;
     }
 
-    private Expression searchVariableExpressionInGivenUnit(String variableName) {
-       List<Expression> variableExpressionsQueue = this.scheme.getGivenUnit().getExpressionQueue();
-       for(Expression expression: variableExpressionsQueue){
-           String inputVariableName= (String)expression.getLeftHandSide().apply();
-           if(inputVariableName.equals(variableName)){
-               return expression;
-           }
-       }
-       return null;
-    }
 
     private Expression buildArrayVariable(String variableName, BenefitParser.VariableInitializerContext variableInitializerContext) {
         List<Expression> arrayElements = new ArrayList<>();
@@ -184,13 +174,13 @@ public class ExpressionBuilder {
             Expression expression = processExpression(initializerContext.expression());
             arrayElements.add(expression);
         }
-        return new VariableExpression(new UnaryExpression(variableName), new UnaryExpression(arrayElements));
+        return new VariableExpression(new VariableIdentifierExpression(variableName),new UnaryExpression(arrayElements));
     }
 
     private Expression buildNonArrayVariable(String variableName, BenefitParser.VariableInitializerContext variableInitializerContext) {
         BenefitParser.ExpressionContext initializerContext = variableInitializerContext.expression();
         Expression unaryExpression = processExpression(initializerContext);
-        return new VariableExpression(new UnaryExpression(variableName), unaryExpression);
+        return new VariableExpression(new VariableIdentifierExpression(variableName),unaryExpression);
     }
 
     public Expression processVariableDeclaration(BenefitParser.VariableDeclarationStatementContext variableDeclarationStatementContext) {
@@ -203,17 +193,16 @@ public class ExpressionBuilder {
                     if (null != variableDeclarationStatementContext.ASSIGN()) {   //assignment statement
                         return buildArrayVariable(variableName, variableInitializerContext);
                     } else if (null != variableDeclarationStatementContext.ASINPUT()) {
-                        //Put InputValuePlaceHolder here as at the time of parsing the tree the variable value in absent
-                        UnaryExpression value = new UnaryExpression(new InputValuePlaceHolder(variableName));
-                        return new VariableExpression(new UnaryExpression(variableName),value);
+                        return scheme.searchVariableExpression(variableName);
                     }
                 } else {
                     if (null != variableDeclarationStatementContext.ASSIGN()) {   //assignment statement
                         return buildNonArrayVariable(variableName, variableInitializerContext);
                     } else if (null != variableDeclarationStatementContext.ASINPUT()) {
                         //Put InputValuePlaceHolder here as at the time of parsing the tree the variable value in absent
-                        UnaryExpression value = new UnaryExpression(new InputValuePlaceHolder(variableName));
-                        return new VariableExpression(new UnaryExpression(variableName),value);
+                        //UnaryExpression value = new UnaryExpression(new InputValuePlaceHolder(variableName));
+                        //return new VariableExpression(new UnaryExpression(variableName),value);
+                        return scheme.searchVariableExpression(variableName);
                     }
                 }
             }
@@ -253,17 +242,16 @@ public class ExpressionBuilder {
         if(null != iterativeAggregationExpressionContext.SUMOF() && null != iterativeAggregationExpressionContext.EACH()){
             if(null != iterativeAggregationExpressionContext.variableDeclarationStatement()){
                 String variableName = iterativeAggregationExpressionContext.variableDeclarationStatement().variableDeclaratorId().variableName().getText();
-                Expression lhsVariableExpression = searchVariableExpressionInGivenUnit(variableName);
-                return  lhsVariableExpression;
+                return scheme.searchVariableExpression(variableName);
             }else if(null != iterativeAggregationExpressionContext.expression()){
                 BenefitParser.ExpressionContext expressionContext =iterativeAggregationExpressionContext.expression();
                 TerminalNode LHS_IDENTIFIER = expressionContext.conditionalExpression().conditionalOrExpression().conditionalAndExpression(0).relationalExpression(0).additiveExpression(0).multiplicativeExpression(0).unaryExpression(0).primary().variableName().IDENTIFIER();
                 if( null != LHS_IDENTIFIER){
-                    String lhsVariableName = LHS_IDENTIFIER.getText();
+                    //String lhsVariableName = LHS_IDENTIFIER.getText();
                    TerminalNode RHS_IDENTIFIER = expressionContext.conditionalExpression().conditionalOrExpression().conditionalAndExpression(0).relationalExpression(0).additiveExpression(0).iterativeAggregationExpression().variableDeclarationStatement().variableDeclaratorId().variableName().IDENTIFIER();
                    if(null != RHS_IDENTIFIER){
                        String rhsVariableName = RHS_IDENTIFIER.getText();
-                        Expression rhsVariableExpression = searchVariableExpressionInGivenUnit(rhsVariableName);
+                        Expression rhsVariableExpression = scheme.searchVariableExpression(rhsVariableName);
                       return new ArithmeticExpression(ArithmeticOperator.LOOPADDITION,rhsVariableExpression,null);
                    }
                 }
@@ -310,24 +298,26 @@ public class ExpressionBuilder {
         if (null != literalContext) {
             if (null != literalContext.NUMBER()) {
                 Number literalNumericValue = Double.parseDouble(literalContext.NUMBER().getText());
-                UnaryExpression numericUnaryExpression = new UnaryExpression(literalNumericValue);
-                return numericUnaryExpression;
+                return  new UnaryExpression(literalNumericValue);
             } else if (null != literalContext.StringLiteral()) {
                 String literalStringValue = literalContext.StringLiteral().getText();
-                UnaryExpression stringUnaryExpression = new UnaryExpression(literalStringValue);
-                return stringUnaryExpression;
+                return new UnaryExpression(literalStringValue);
             } else if (null != literalContext.BooleanLiteral()) {
                 Boolean literalBooleanValue = Boolean.parseBoolean(literalContext.BooleanLiteral().getText());
-                UnaryExpression booleanUnaryExpression = new UnaryExpression(literalBooleanValue);
-                return booleanUnaryExpression;
+                return new UnaryExpression(literalBooleanValue);
             } else {
                 String literalStringValue = literalContext.NullLiteral().getText();
-                UnaryExpression stringUnaryExpression = new UnaryExpression(literalStringValue);
-                return stringUnaryExpression;
+                return new UnaryExpression(literalStringValue);
             }
         } else if (null != unaryExpressionContext.primary().variableName()) {
-            return new UnaryExpression(unaryExpressionContext.primary().variableName().getText());
-
+            Expression variableExpression = scheme.searchVariableExpression(unaryExpressionContext.primary().variableName().getText());
+            if( null != variableExpression){
+                return variableExpression;
+            }else{
+                variableExpression= new VariableExpression(new VariableIdentifierExpression(unaryExpressionContext.primary().variableName().getText()),new UnaryExpression(null));
+                //scheme.getComputeUnit().addExpression(variableExpression);
+                return  variableExpression;
+            }
         }
         return null;
     }

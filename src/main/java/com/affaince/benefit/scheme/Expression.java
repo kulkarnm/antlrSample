@@ -43,4 +43,14 @@ public abstract class Expression {
                 this.getClass().getGenericInterfaces()[0])
                 .getActualTypeArguments()[0];
     }
+
+    @Override
+    public String toString() {
+        return "Expression{" +
+                "operator=" + operator +
+                ", leftHandSide=" + leftHandSide +
+                ", rightHandSide=" + rightHandSide +
+                ", preExpression=" + preExpression +
+                '}';
+    }
 }

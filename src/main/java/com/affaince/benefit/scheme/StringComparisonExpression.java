@@ -20,6 +20,12 @@ public class StringComparisonExpression extends Expression {
             case NOTEQUALTO:
                 BiFunction<Expression,Expression,?> notEqualTo = (a,b) ->!a.apply().toString().equals(b.apply().toString()) ;
                 return executeBiFunction(notEqualTo);
+            case AND:
+                BiFunction<Expression,Expression,?> andTwoExpressions = (a,b)->((Boolean)a.apply()).booleanValue() && ((Boolean)b.apply()).booleanValue() ;
+                return executeBiFunction(andTwoExpressions);
+            case OR :
+                BiFunction<Expression,Expression,?> orTwoExpressions = (a,b)->((Boolean)a.apply()).booleanValue() || ((Boolean)b.apply()).booleanValue() ;
+                return executeBiFunction(orTwoExpressions);
             default:
                 throw new IllegalStateException("Unexpected value: " + this.getOperator());
         }

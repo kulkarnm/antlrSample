@@ -1,6 +1,9 @@
 package com.affaince.benefit;
 
+import com.affaince.benefit.dummy.DummyEvent;
+import com.affaince.benefit.dummy.DummyEventProcessor;
 import com.affaince.benefit.processor.BenefitSchemeListener;
+import com.affaince.benefit.processor.SchemeExecutor;
 import com.affaince.benefit.scheme.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -59,15 +62,26 @@ public class TestMain {
                 "\t pay BENEFIT_VALUE\n" +
                 "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;";
 
+        DummyEvent dummyEvent = new DummyEvent(25000,12,12);
+        DummyEventProcessor dummyEventProcessor = new DummyEventProcessor();
+        Scheme scheme = new Scheme();
+        scheme = dummyEventProcessor.processDummyEvent(scheme,dummyEvent);
+
+
         BenefitLexer lexer = new BenefitLexer(CharStreams.fromString(str));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         BenefitParser parser = new BenefitParser(tokens);
         ParseTree tree = parser.scheme();
         ParseTreeWalker walker = new ParseTreeWalker();
-        BenefitSchemeListener listener = new BenefitSchemeListener();
+
+        BenefitSchemeListener listener = new BenefitSchemeListener(scheme);
         walker.walk(listener,tree);
-        Scheme scheme = listener.getScheme();
+        scheme = listener.getScheme();
         System.out.println("Scheme: " + scheme);
+
+        SchemeExecutor schemeExecutor = new SchemeExecutor();
+        BenefitSchemeContext benefitSchemeContext = schemeExecutor.executeScheme(scheme);
+        System.out.println(benefitSchemeContext);
 
     }
 }

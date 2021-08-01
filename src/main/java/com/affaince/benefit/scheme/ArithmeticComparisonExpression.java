@@ -59,6 +59,12 @@ public class ArithmeticComparisonExpression extends Expression {
             case LOOPNOTEQUALTO:
                 BiFunction<Expression,Expression,?> notEqualToInLoop =  (a,b)->((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() != ((Number)b.apply()).doubleValue());
                 return executeBiFunction(notEqualToInLoop);
+            case AND:
+                BiFunction<Expression,Expression,?> andTwoExpressions = (a,b)->((Boolean)a.apply()).booleanValue() && ((Boolean)b.apply()).booleanValue() ;
+                return executeBiFunction(andTwoExpressions);
+            case OR :
+                BiFunction<Expression,Expression,?> orTwoExpressions = (a,b)->((Boolean)a.apply()).booleanValue() || ((Boolean)b.apply()).booleanValue() ;
+                return executeBiFunction(orTwoExpressions);
             default:
                 throw new IllegalStateException("Unexpected value: " + this.getOperator());
         }

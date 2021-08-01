@@ -14,7 +14,7 @@ public class SchemeExecutor {
         this.benefitSchemeContext = new BenefitSchemeContext();
     }
 
-    public void executeScheme(Scheme scheme){
+    public BenefitSchemeContext executeScheme(Scheme scheme){
         scheme.getGivenUnit().execute(benefitSchemeContext);
         scheme.getEligibilityUnit().execute(benefitSchemeContext);
         System.out.println("eligibility :" + benefitSchemeContext.getEligibleForScheme());
@@ -22,6 +22,7 @@ public class SchemeExecutor {
             scheme.getComputeUnit().execute(benefitSchemeContext);
             scheme.getPayUnit().execute(benefitSchemeContext);
         }
+        return this.benefitSchemeContext;
     }
 
 

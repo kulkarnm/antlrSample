@@ -9,21 +9,22 @@ import java.util.List;
 public class BenefitSchemeListener extends BenefitBaseListener {
     private Scheme scheme;
     private ExpressionBuilder expressionBuilder;
+    public BenefitSchemeListener(Scheme scheme){
+        this.scheme = scheme;
+    }
     @Override public void enterScheme(BenefitParser.SchemeContext ctx) {
-        this.scheme = new Scheme();
         expressionBuilder = new ExpressionBuilder(this.scheme);
     }
 
-    @Override public void enterGivenUnit(BenefitParser.GivenUnitContext ctx) {
-        GivenUnit givenUnit = new GivenUnit();
-        this.scheme.setGivenUnit(givenUnit);
-    }
-
-    @Override public void exitVariableDeclarationStatement(BenefitParser.VariableDeclarationStatementContext ctx) {
-        scheme.getGivenUnit().addExpression(expressionBuilder.processVariableDeclaration(ctx));
+    @Override
+    public void exitGivenUnit(BenefitParser.GivenUnitContext ctx) {
+        List<BenefitParser.VariableDeclarationStatementContext> variableDeclarationStatementContexts = ctx.givenBody().variableDeclarationStatement();
+        for(BenefitParser.VariableDeclarationStatementContext context: variableDeclarationStatementContexts){
+            scheme.getGivenUnit().addExpression(expressionBuilder.processVariableDeclaration(context));
+        }
         System.out.println(" exit variable declaration statement");
-
     }
+
 
     @Override
     public void exitComputeBlock(BenefitParser.ComputeBlockContext ctx) {
@@ -31,34 +32,21 @@ public class BenefitSchemeListener extends BenefitBaseListener {
        for(BenefitParser.BlockStatementContext blockStatementContext:blockStatementContexts){
            scheme.getComputeUnit().addExpression(expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression()));
        }
+        System.out.println("exit ComputeBlock");
     }
 
-    @Override public void enterComputeUnit(BenefitParser.ComputeUnitContext ctx) {
-        ComputeUnit computeUnit = new ComputeUnit();
-        this.scheme.setComputeUnit(computeUnit);
-    }
-
-
-    @Override public void enterEligibilityUnit(BenefitParser.EligibilityUnitContext ctx) {
-        EligibilityUnit eligibilityUnit= new EligibilityUnit();
-        this.scheme.setEligibilityUnit(eligibilityUnit);
-    }
     @Override public void exitEligibilityUnit(BenefitParser.EligibilityUnitContext ctx) {
         List<BenefitParser.BlockStatementContext> blockStatementContexts =ctx.block().blockStatement();
         for(BenefitParser.BlockStatementContext blockStatementContext:blockStatementContexts){
             scheme.getEligibilityUnit().addExpression(expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression()));
         }
-    }
-    @Override public void enterPayUnit(BenefitParser.PayUnitContext ctx) {
-        PayUnit payUnit=new PayUnit();
-        this.scheme.setPayUnit(payUnit);
+        System.out.println("exit eligibility unit");
     }
 
     @Override public void exitPayUnit(BenefitParser.PayUnitContext ctx) {
        PaymentExpressionBuilder paymentExpressionBuilder = new PaymentExpressionBuilder();
        this.scheme.getPayUnit().setPaymentExpression(paymentExpressionBuilder.buildPaymentExpression(ctx,this.scheme));
-    }
-    @Override public void exitExpression(BenefitParser.ExpressionContext ctx) {
+        System.out.println("exit payment unit");
     }
 
     public Scheme getScheme() {

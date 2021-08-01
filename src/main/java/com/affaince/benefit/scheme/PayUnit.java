@@ -9,7 +9,12 @@ public class PayUnit {
 
     public PayUnit() {
     }
-
+    public Expression searchVariableExpression(String variableName) {
+        if(null != paymentExpression){
+            return paymentExpression.searchVariableExpression(variableName);
+        }
+        return null;
+    }
     public void setPaymentExpression(PaymentExpression paymentExpression) {
         this.paymentExpression = paymentExpression;
     }

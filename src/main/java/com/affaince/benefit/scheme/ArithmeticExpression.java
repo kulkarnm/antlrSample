@@ -59,7 +59,9 @@ public class ArithmeticExpression extends Expression {
                     }
                 }
                 return executeBiFunction(ternary);
-
+            case ASSIGN:
+                BiFunction<Expression, Expression,?> assign = (a, b) -> ((Number)b.apply()).doubleValue();
+                return executeBiFunction(assign);
             default:
                 throw new IllegalStateException("Unexpected value: " + this.getOperator());
         }
