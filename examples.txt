@@ -1,0 +1,234 @@
+Benefits
+	- Offer some advantages to the customers for following certain being practices
+
+How are benefits derived?
+
+Define Objective
+	-Define actions towards objective fulfilment
+
+Define scheme to fulfil the objective 
+	- define input
+	- define benefit value per point	
+	- criteria
+	- compute benefit count and benefit value
+
+Example sObjective
+	- Promote volume /value of sale per subscription
+		- offer benefits on subscription beyond a threshold subscription value
+			input
+				SUBSCRIPTION_VALUE as input ;
+				SUBSCRIPTION_PERIOD as input ;
+			Criteria
+			- 	SUBSCRIPTION_VALUE > 20000 and
+				SUBSCRIPTION_VALUE < 30000 and
+				SUBSCRIPTION_PERIOD >= 10 ( optional)
+
+		- introspect and revise subscription threshold value  on periodic basis
+		- Revise/Introspect need for the said benefit
+
+	- Promote continuity of subscription
+		- offer benefit(s) on renewal of subscription
+			Input
+				SUBSCRIPTION_RENEWAL_COUNT as input ;
+				SUBSCRIPTION_PERIOD_PER_SUBSCRIPTION [] as input ;
+			Criteria
+				SUBSCRIPTION_RENEWAL_NUMBER > 3 and
+				each SUBSCRIPTION_PERIOD_PER_SUBSCRIPTION >= 8 and	
+				TOTAL_SUBSCRIPTION_PERIOD > 28	;		( optional)
+				
+		- Introspect and revise thresholds of subscription renewal count/value
+		- Revise/Introspect need for the said benefit
+
+	- Discourage subscription modification
+		- offer benefit upon no modifications/minimum modifications to the registered subscription so as to maintain subscription value same or more.
+			Input
+				NUMBER_OF_MODIFICATIONS_PER_SUBSCRIPTION as input ;
+				NUMBER_OF_RENEWALS as input ;
+			Criteria
+				NUMBER_OF_MODIFICATIONS_PER_SUBSCRIPTION < 3	;
+
+		- Introspect/revise thresholds set on subscription modification counts
+		- Revise/Introspect need for the said benefit
+	- Discourage cancellations before subscription completion
+		- Offer benefit for non cancellation of subscription during its active tenure.
+			Input
+				NUMBER_OF_CANCELLATIONS as input ;
+				NUMBER_OF_RENEWALS as input ;
+			Criteria
+				NUMBER_OF_CANCELLATIONS < 2
+
+		- Introspect / revise the subscription continuity cycles ( number of deliveries)
+ 		- Revise/Introspect need for the said benefit
+	- Promote sale of specific product/product family/brand
+		- Offer benefit upon subscription to the specific product/brand for a threshold volume
+			Input
+				PRODUCT_SUBSCRIPTION_COUNT_PER_SUBSCRIPTION[] as input ;
+				PRODUCT_ID as input ;	
+			Criteria
+				PRODUCT_ID IS ‘Product1’ ;
+		- revise introspect the threshold volume, need to continue with the said benefit
+	- Discourage subscribers from missing payment instalments
+			Input
+				NUMBER_OF_PAYMENT_MISSES_IN_SUBSCRIPTION [] as input
+			Criteria
+				each NUMBER_OF_PAYMENT_MISSES_IN_SUBSCRIPTION < MAXIMUM_ALLOWED_PAYMENT_MISS_COUNT
+
+Identify triggers/events which should invite triggering of benefits calculation
+	- A subscriber subscribes for a subscription of a specific subscriptionValue 
+	- A subscriber renewed subscription of a specific value
+	- A subscriber modifies subscription
+	- A subscriber cancels subscription.
+	- A subscriber makes payment instalment
+	- A subscriber refers others
+	- A Subscriber forms a syndicate
+
+How to 
+	It can be done in two modes
+		- asynchronous processing	
+			- Map schemes to events
+			- Map event attributes to scheme specific variables( there can be direct assignment or summation/aggregation)
+			- Receive event
+			- Build Benefits Context comprising of mapped scheme attributes and their values. It will act as input.
+			- Trigger event specific( or all?) schemes traversal and see which scheme the subscriber is deemed fit.
+			- Execute scheme logic with the passed Benefits Context and calculate benefit count/value
+			- Update the subscriber/subscription specific benefit count/value
+			- Send event back to the input event sender informing it the revised benefit count
+	
+#################################Example scenarios ################################################
+
+Scene 1 Offer reward points as per  subscription value and subscription period
+
+given 
+	 UNIT_SUBSCRIPTION_VALUE = 1000 ;
+	 UNIT_PERIOD_MONTH = 2 ;
+	 VALUE_PER_POINT = 1 ;
+	 SUBSCRIPTION_VALUE as input ;
+	 SUBSCRIPTION_PERIOD as input ;
+
+compute 
+	 RESULT1= SUBSCRIPTION_VALUE / UNIT_SUBSCRIPTION_VALUE ;
+	 RESULT2= SUBSCRIPTION_PERIOD / UNIT_PERIOD_MONTH ;
+	 BENEFIT_COUNT = RESULT1*RESULT2 ;
+	 BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT ;
+
+eligibleWhen	
+	SUBSCRIPTION_VALUE > 20000 and
+	SUBSCRIPTION_VALUE < 30000 and
+	SUBSCRIPTION_PERIOD >= 10 ;
+
+pay BENEFIT_VALUE 
+ 	after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;
+
+Scene 2 Offer rewards points on loyalty	
+
+given 	
+	 VALUE_PER_POINT = 10 ;
+	 SUBSCRIPTION_RENEWAL_COUNT as input ;
+	 SUBSCRIPTION_PERIOD_PER_SUBSCRIPTION [] as input ;
+
+compute 
+	 BENEFIT_COUNT = SUBSCRIPTION_RENEWAL_NUMBER ;
+	 BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT ;
+	 TOTAL_SUBSCRIPTION_PERIOD =sumOf each SUBSCRIPTION_PERIOD_PER_SUBSCRIPTION ;
+
+eligibleWhen 
+	SUBSCRIPTION_RENEWAL_NUMBER > 3 and
+	each SUBSCRIPTION_PERIOD_PER_SUBSCRIPTION >= 8 and		
+	TOTAL_SUBSCRIPTION_PERIOD > 28	;
+
+pay BENEFIT_VALUE
+ 	after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;
+
+
+Scene 3 Another variant of loyalty points
+
+given 	
+	 VALUE_PER_POINT = 100 ;
+	 SUBSCRIPTION_RENEWAL_COUNT as input ;
+	 SUBSCRIPTION_PERIOD[] as input ;
+
+compute 
+	 BENEFIT_COUNT = SUBSCRIPTION_RENEWAL_NUMBER ;
+	 BENEFIT_VALUE = SUBSCRIPTION_RENEWAL_NUMBER * VALUE_PER_POINT ;
+
+eligibleWhen 
+	SUBSCRIPTION_RENEWAL_COUNT > 3 and
+	 each SUBSCRIPTION_PERIOD >= 8 ;
+
+pay BENEFIT_VALUE 
+ 	after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;
+
+Scene4 Product specific loyalty
+
+given 	
+	 VALUE_PER_POINT = 10 ;
+	 PRODUCT_SUBSCRIPTION_COUNT_PER_SUBSCRIPTION[] as input ;
+	 PRODUCT_ID as input ;	
+
+compute 
+	 BENEFIT_COUNT = sumOf each PRODUCT_SUBSCRIPTION_COUNT_PER_SUBSCRIPTION ;
+	 BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT ;
+
+eligibleWhen 
+	PRODUCT_ID == “Product1” ;
+
+pay BENEFIT_VALUE 
+ 	after 1/4, 1/2, 3/4  of TOTAL_DELIVERIES in default proportion ;
+
+
+Scene5 Awards for discouraging subscription modifications
+
+
+given  	
+	 VALUE_PER_POINT = 10	;
+	 NUMBER_OF_MODIFICATIONS_PER_SUBSCRIPTION as input ;
+	 NUMBER_OF_RENEWALS as input ;
+
+compute 
+	 BENEFIT_COUNT = NUMBER_OF_RENEWALS / (NUMBER_OF_MODIFICATIONS_PER_SUBSCRIPTION > 0 ? NUMBER_OF_MODIFICATIONS_PER_SUBSCRIPTION : 1)  ;
+	 BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT	;
+
+eligibleWhen 
+	NUMBER_OF_MODIFICATIONS_PER_SUBSCRIPTION < 3	;
+
+pay BENEFIT_VALUE 
+ 	after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion;
+
+
+Scene6 Award for discouraging payment misses
+
+given	
+	 VALUE_PER_POINT = 10 ;
+	 MAXIMUM_ALLOWED_PAYMENT_MISS_COUNT_PER_SUBSCRIPTION = 3 ;
+	 NUMBER_OF_PAYMENT_MISSES_IN_SUBSCRIPTION [] as input ;
+	
+compute 
+	 BENEFIT_COUNT = sumOf each (MAXIMUM_ALLOWED_PAYMENT_MISS_COUNT_PER_SUBSCRIPTION - NUMBER_OF_PAYMENT_MISSES_IN_SUBSCRIPTION) ;
+	 BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT ;
+	
+eligibleWhen 
+	each NUMBER_OF_PAYMENT_MISSES_IN_SUBSCRIPTION < MAXIMUM_ALLOWED_PAYMENT_MISS_COUNT ;
+
+pay BENEFIT_VALUE
+ 	after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion;
+
+
+Scene7: Awards for discouraging subscription cancellations
+
+
+given  	
+	 VALUE_PER_POINT = 10	;
+	 NUMBER_OF_CANCELLATIONS as input ;
+	 NUMBER_OF_RENEWALS as input ;
+
+compute 
+	 BENEFIT_COUNT = (NUMBER_OF_RENEWALS / (NUMBER_OF_CANCELLATIONS > 0) ? NUMBER_OF_CANCELLATIONS  : 1)  ;
+	 BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT	;
+
+eligibleWhen 
+	NUMBER_OF_CANCELLATIONS < 2	;
+
+pay BENEFIT_VALUE 
+ 	after 1 / 4, 1 / 2, 3 / 4 of TOTAL_DELIVERIES in default proportion;
+
+################################# END - Example scenarios ################################################
