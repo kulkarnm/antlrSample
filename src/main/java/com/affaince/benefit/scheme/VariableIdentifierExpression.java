@@ -11,7 +11,7 @@ public class VariableIdentifierExpression extends Expression {
     @Override
     public Object apply() {
         //return  (scheme)-> scheme.getGivenUnit().searchVariableExpression(identifier).apply();
-        return identifier;
+        return this.getIdentifier();
     }
 
     public String getIdentifier() {

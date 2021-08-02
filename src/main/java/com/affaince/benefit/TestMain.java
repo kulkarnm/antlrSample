@@ -9,38 +9,13 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import javax.sound.midi.Soundbank;
+import java.util.List;
+import java.util.Map;
+
 public class TestMain {
     public static void main(String[] args){
-        // RESULT1= SUBSCRIPTION_VALUE / UNIT_SUBSCRIPTION_VALUE ;
- /*       double subscriptionValue = 10000;
-        double unitSubscriptionValue = 1000;
-        UnaryExpression u1 = new UnaryExpression(subscriptionValue);
-        UnaryExpression u2 = new UnaryExpression(unitSubscriptionValue);
-        ArithmeticExpression exp =
-                new ArithmeticExpression(
-                        ArithmeticOperator.DIVISION,
-                        new VariableExpression(new UnaryExpression("subscriptionValue"), u1),
-                        new VariableExpression(new UnaryExpression("unitSubscriptionValue"),u2));
-        System.out.println(exp.apply());
-        List<Number> list = new ArrayList<>(Arrays.asList(1,2,3,4,5,6,7));
-        double num = 6;
-        UnaryExpression u3 = new UnaryExpression(list);
-        UnaryExpression u4 = new UnaryExpression(num);
-        ArithmeticComparisonExpression exp2 =
-                new ArithmeticComparisonExpression(
-                        ArithmeticOperator.LOOPLESSTHAN,
-                        new VariableExpression(new UnaryExpression("list"), u3),
-                        new VariableExpression(new UnaryExpression("num"),u4));
-        System.out.println(exp2.apply());
-
-        ArithmeticExpression exp3 =
-                new ArithmeticExpression(
-                        ArithmeticOperator.LOOPADDITION,
-                        new VariableExpression(new UnaryExpression("list"),u3),
-                        new VariableExpression(null,null));
-        System.out.println(exp3.apply());*/
          execute();
-
     }
 
     public static void execute(){
@@ -81,7 +56,28 @@ public class TestMain {
 
         SchemeExecutor schemeExecutor = new SchemeExecutor();
         BenefitSchemeContext benefitSchemeContext = schemeExecutor.executeScheme(scheme);
-        System.out.println(benefitSchemeContext);
+        print(benefitSchemeContext);
+    }
 
+    public static void print(BenefitSchemeContext benefitSchemeContext){
+        System.out.println("***********LETS GO THROUGH INPUT,COMPUTED AND OUTPUT VALUES**********");
+        System.out.println("***********************INPUT VALUES**********************************");
+        Map<String,Object>inputVariables  = benefitSchemeContext.getBenefitInputContext().getInputVariables();
+        for(Map.Entry<String,Object>inputEntry: inputVariables.entrySet()){
+            System.out.print(" Input field: " + inputEntry.getKey());
+            System.out.println(" input value: " + inputEntry.getValue());
+        }
+        System.out.println("***********************END - INPUT VALUES**********************************");
+        System.out.println("***********************OUTPUT VALUES**********************************");
+        BenefitSchemeContext.BenefitOutputContext outputContext = benefitSchemeContext.getBenefitOutputContext();
+        System.out.println("Is account eligible for the benefit? :" + outputContext.getEligibleForScheme());
+        System.out.println("total benefit value : " + outputContext.getBenefitValue());
+        System.out.println("is vesting BEFORE stated delivery number?: " + outputContext.isBefore());
+        System.out.println("benefit points vesting distribution list");
+        List<BenefitSchemeContext.BenefitOutputContext.BenefitVestingDistribution> benefitVestingDistributionList =   outputContext.getBenefitVestingDistributionList();
+        for(BenefitSchemeContext.BenefitOutputContext.BenefitVestingDistribution distribution: benefitVestingDistributionList){
+            System.out.print(" BEFORE/AFTER " + distribution.getDeliveryNumber() + " delivery,");
+            System.out.println(" Vest " + distribution.getBenefitValueToBeVested() + " points");
+        }
     }
 }

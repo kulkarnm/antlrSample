@@ -21,7 +21,7 @@ public class BenefitSchemeContext {
     public void setEligibleForScheme(boolean isEligible){
         this.benefitOutputContext.setEligibleForScheme(isEligible);
     }
-    public void addToBenefitVestingDistributionList(int deliveryNumber,double benefitValueToBeVested){
+    public void addToBenefitVestingDistributionList(double deliveryNumber,double benefitValueToBeVested){
         this.benefitOutputContext.addToBenefitVestingDistributionList(deliveryNumber,benefitValueToBeVested);
     }
     public void setBefore(boolean isBefore){
@@ -44,10 +44,8 @@ public class BenefitSchemeContext {
     public Object searchVariableValue(String variableName){
         return benefitInputContext.searchVariableValue(variableName);
     }
-    private class BenefitInputContext{
+    public class BenefitInputContext{
         private Map<String,Object> inputVariables;
-
-
         BenefitInputContext(){
             inputVariables = new HashMap<>();
         }
@@ -66,7 +64,7 @@ public class BenefitSchemeContext {
             return inputVariables.entrySet().stream().filter(var->var.getKey().equals(variableName)).findAny().get().getValue();
         }
     }
-    private class BenefitOutputContext{
+    public class BenefitOutputContext{
         private Boolean isEligibleForScheme;
         private double benefitValue;
         private boolean isBefore;
@@ -108,20 +106,20 @@ public class BenefitSchemeContext {
         public void setBenefitVestingDistributionList(List<BenefitVestingDistribution> benefitVestingDistributionList) {
             this.benefitVestingDistributionList = benefitVestingDistributionList;
         }
-        public void addToBenefitVestingDistributionList(int deliveryNumber,double benefitValueToBeVested){
+        public void addToBenefitVestingDistributionList(double deliveryNumber,double benefitValueToBeVested){
             BenefitVestingDistribution benefitVestingDistribution= new BenefitVestingDistribution(deliveryNumber,benefitValueToBeVested);
             this.benefitVestingDistributionList.add(benefitVestingDistribution);
         }
-        private class BenefitVestingDistribution{
-            private int deliveryNumber;
+        public class BenefitVestingDistribution{
+            private double deliveryNumber;
             private double benefitValueToBeVested;
 
-            public BenefitVestingDistribution(int deliveryNumber, double benefitValueToBeVested) {
+            public BenefitVestingDistribution(double deliveryNumber, double benefitValueToBeVested) {
                 this.deliveryNumber = deliveryNumber;
                 this.benefitValueToBeVested = benefitValueToBeVested;
             }
 
-            public int getDeliveryNumber() {
+            public double getDeliveryNumber() {
                 return deliveryNumber;
             }
 

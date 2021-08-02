@@ -11,7 +11,7 @@ public class Scheme {
         givenUnit = new GivenUnit();
         computeUnit = new ComputeUnit();
         eligibilityUnit= new EligibilityUnit();
-        payUnit=new PayUnit();
+        payUnit=new PayUnit(givenUnit,computeUnit);
     }
 
     public Expression searchVariableExpression(String variableName){
@@ -31,6 +31,8 @@ public class Scheme {
         }
         return null;
     }
+
+
     public GivenUnit getGivenUnit() {
         return givenUnit;
     }

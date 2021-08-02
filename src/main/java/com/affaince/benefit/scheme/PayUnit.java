@@ -6,8 +6,11 @@ import java.util.Map;
 
 public class PayUnit {
     private PaymentExpression paymentExpression;
-
-    public PayUnit() {
+    private GivenUnit givenUnit;
+    private ComputeUnit computeUnit;
+    public PayUnit(GivenUnit givenUnit,ComputeUnit computeUnit) {
+        this.givenUnit = givenUnit;
+        this.computeUnit = computeUnit;
     }
     public Expression searchVariableExpression(String variableName) {
         if(null != paymentExpression){
@@ -25,7 +28,6 @@ public class PayUnit {
 
     public void execute(BenefitSchemeContext benefitSchemeContext){
 
-         String payableVariableName = (String)paymentExpression.getPayableVariable().getLeftHandSide().apply();
          Object value = paymentExpression.getPayableVariable().apply();
          benefitSchemeContext.setBenefitValue((Double)value);
          PaymentPrecedence paymentPrecedence = paymentExpression.getPrecedence();
@@ -34,7 +36,11 @@ public class PayUnit {
          }
          Map<Expression,Expression> vestingDistributionExpressions = paymentExpression.getVestingDistributionExpressions();
          for(Map.Entry<Expression,Expression> deliveryWiseBenefitTuple: vestingDistributionExpressions.entrySet()){
-            benefitSchemeContext.addToBenefitVestingDistributionList((Integer)deliveryWiseBenefitTuple.getKey().apply(),(Double)deliveryWiseBenefitTuple.getValue().apply());
+            benefitSchemeContext.addToBenefitVestingDistributionList((Double)deliveryWiseBenefitTuple.getKey().apply(),(Double)deliveryWiseBenefitTuple.getValue().apply());
          }
+    }
+
+    public void syncAllVariableReferences(GivenUnit givenUnit,ComputeUnit computeUnit){
+        this.paymentExpression.syncAllVariableReferences(givenUnit,computeUnit);
     }
 }

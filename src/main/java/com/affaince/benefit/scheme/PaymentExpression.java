@@ -14,50 +14,50 @@ public class PaymentExpression {
         vestingDistributionExpressions = new HashMap<>();
     }
 
-/*    public void updateAllVariableReferences(String variableName, Expression expression) {
-
-        Expression foundExpression = searchVariableExpressionByName(variableName, payableVariable);
-        if(null != foundExpression){
-            foundExpression.setRightHandSide(expression);
+    public void syncAllVariableReferences(GivenUnit givenUnit,ComputeUnit computeUnit) {
+        //payableVariable
+        Expression valuedVariableExpression = searchVariableExpressionByName((String)payableVariable.getLeftHandSide().apply(),givenUnit,computeUnit);
+        if(null != valuedVariableExpression) {
+            payableVariable.setRightHandSide(valuedVariableExpression.getRightHandSide());
         }
-        for (Expression variableExpression : this.vestingPeriodicityExpressions) {
-            foundExpression = searchVariableExpressionByName(variableName, variableExpression);
-            if(null != foundExpression){
-                foundExpression.setRightHandSide(expression);
+        valuedVariableExpression = searchVariableExpressionByName((String)multiplierVariable.getLeftHandSide().apply(),givenUnit,computeUnit);
+        if(null != valuedVariableExpression) {
+            multiplierVariable.setRightHandSide(valuedVariableExpression.getRightHandSide());
+        }
+        for(Expression vestingPeriodicityExpression : vestingPeriodicityExpressions){
+            valuedVariableExpression = searchVariableExpressionByName((String)vestingPeriodicityExpression.getRightHandSide().getLeftHandSide().apply(),givenUnit,computeUnit);
+            if(null != valuedVariableExpression){
+                vestingPeriodicityExpression.getRightHandSide().setRightHandSide(valuedVariableExpression.getRightHandSide());
             }
         }
-        foundExpression = searchVariableExpressionByName(variableName, multiplierVariable);
-        if(null != foundExpression){
-            foundExpression.setRightHandSide(expression);
-        }
-        Set<Map.Entry<Expression, Expression>> entrySet =  vestingDistributionExpressions.entrySet();
-        for(Map.Entry<Expression,Expression> entry : entrySet){
-            foundExpression = searchVariableExpressionByName(variableName, entry.getKey());
-            if(null != foundExpression){
-                foundExpression.setRightHandSide(expression);
+        for(Map.Entry<Expression,Expression> vestingDistributionExpressionEntry : vestingDistributionExpressions.entrySet()){
+            Expression vestingPeriodicityExpression = vestingDistributionExpressionEntry.getKey();
+            valuedVariableExpression = searchVariableExpressionByName((String)vestingPeriodicityExpression.getRightHandSide().getLeftHandSide().apply(),givenUnit,computeUnit);
+            if(null != valuedVariableExpression){
+                vestingPeriodicityExpression.getRightHandSide().setRightHandSide(valuedVariableExpression.getRightHandSide());
             }
-            foundExpression = searchVariableExpressionByName(variableName, entry.getValue());
-            if(null != foundExpression){
-                foundExpression.setRightHandSide(expression);
+            Expression arithmeticExpression = vestingDistributionExpressionEntry.getValue();
+            Expression payVariableExpression = arithmeticExpression.getRightHandSide();
+            valuedVariableExpression = searchVariableExpressionByName((String)payVariableExpression.getLeftHandSide().apply(),givenUnit,computeUnit);
+            if(null != valuedVariableExpression){
+                payVariableExpression.getLeftHandSide().setRightHandSide(valuedVariableExpression.getRightHandSide());
             }
         }
     }
 
-    public Expression searchVariableExpressionByName(String variableName, Expression expression) {
+    public Expression searchVariableExpressionByName(String variableName, GivenUnit givenUnit,ComputeUnit computeUnit) {
         Expression foundVariable = null;
-        if (null != expression) {
-            if (expression instanceof VariableExpression) {
-                if (((String) expression.getLeftHandSide().apply()).equals(variableName)) {
-                    return expression;
-                }
-            }
-            foundVariable = searchVariableExpressionByName(variableName, expression.getLeftHandSide());
-            if (null == foundVariable) {
-                foundVariable = searchVariableExpressionByName(variableName, expression.getRightHandSide());
+        foundVariable = givenUnit.searchVariableExpression(variableName);
+        if( null != foundVariable){
+            return  foundVariable ;
+        }else{
+            foundVariable = computeUnit.searchVariableExpression(variableName);
+            if(null != foundVariable){
+                return  foundVariable;
             }
         }
-        return foundVariable;
-    }*/
+        return  null;
+    }
     public Expression searchVariableExpression(String variableName) {
         String payableVariableName = (String)payableVariable.apply();
         if(variableName.equals(payableVariableName)){
