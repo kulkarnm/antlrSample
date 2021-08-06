@@ -14,6 +14,10 @@ public class ArithmeticComparisonExpression extends Expression {
         return biFunction.apply(getLeftHandSide(),getRightHandSide());
     }
 
+    private Object executionFunction(Function<Expression,?> function){
+        return function.apply(getLeftHandSide());
+    }
+
 
 
     private Object executeFunction(Function<Expression, ?> function) {
@@ -60,11 +64,21 @@ public class ArithmeticComparisonExpression extends Expression {
                 BiFunction<Expression,Expression,?> notEqualToInLoop =  (a,b)->((List<Number>)a.apply()).stream().allMatch(i-> i.doubleValue() != ((Number)b.apply()).doubleValue());
                 return executeBiFunction(notEqualToInLoop);
             case AND:
-                BiFunction<Expression,Expression,?> andTwoExpressions = (a,b)->((Boolean)a.apply()).booleanValue() && ((Boolean)b.apply()).booleanValue() ;
-                return executeBiFunction(andTwoExpressions);
+                //BiFunction<Expression,Expression,?> andTwoExpressions = (a,b)->((Boolean)a.apply()).booleanValue() && ((Boolean)b.apply()).booleanValue() ;
+                Function<Expression,?> andExpressions = (a) -> ((List<Expression>)(a.apply()))
+                        .stream().map(element->(Boolean)element.apply())
+                        .reduce(false,
+                                (p,q)-> p && q).booleanValue() ;   //.stream().reduce(Boolean::logicalAnd).orElse(false);
+                return executeFunction(andExpressions);
             case OR :
-                BiFunction<Expression,Expression,?> orTwoExpressions = (a,b)->((Boolean)a.apply()).booleanValue() || ((Boolean)b.apply()).booleanValue() ;
-                return executeBiFunction(orTwoExpressions);
+                //BiFunction<Expression,Expression,?> orTwoExpressions = (a,b)->((Boolean)a.apply()).booleanValue() || ((Boolean)b.apply()).booleanValue() ;
+                //Function<Expression,?> orExpressions = (a) -> ((List<Boolean>)a.apply()).stream().reduce(Boolean::logicalOr).orElse(false);
+                Function<Expression,?> orExpressions = (a) -> ((List<Expression>)(a.apply()))
+                        .stream().map(element->(Boolean)element.apply())
+                        .reduce(false,
+                                (p,q)-> p || q).booleanValue() ;   //.stream().reduce(Boolean::logicalAnd).orElse(false);
+
+                return executeFunction(orExpressions);
             default:
                 throw new IllegalStateException("Unexpected value: " + this.getOperator());
         }

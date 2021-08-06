@@ -52,17 +52,23 @@ public class ExpressionBuilder {
 
     Expression processConditionalOrExpression(BenefitParser.ConditionalOrExpressionContext conditionalOrExpressionContext) {
         if (null != conditionalOrExpressionContext.conditionalAndExpression() && !conditionalOrExpressionContext.conditionalAndExpression().isEmpty()) {
+
             Expression lhsExpression = processConditionalAndExpression(conditionalOrExpressionContext.conditionalAndExpression(0));
 
             if (null != conditionalOrExpressionContext.connectorOr() &&
                     !conditionalOrExpressionContext.connectorOr().isEmpty() &&
                     null != conditionalOrExpressionContext.conditionalAndExpression() &&
                     !conditionalOrExpressionContext.conditionalAndExpression().isEmpty()) {
+                List<Expression> booleanExpressions = new ArrayList<>();
+                booleanExpressions.add(lhsExpression);
                 for (int i = 1; i < conditionalOrExpressionContext.conditionalAndExpression().size(); i++) {
-                    lhsExpression = new ArithmeticComparisonExpression(ArithmeticOperator.OR, lhsExpression, processConditionalAndExpression(conditionalOrExpressionContext.conditionalAndExpression().get(i)));
+                    Expression booleanExpression = processConditionalAndExpression(conditionalOrExpressionContext.conditionalAndExpression().get(i));
+                    booleanExpressions.add(booleanExpression);
                 }
+                return new ArithmeticComparisonExpression(ArithmeticOperator.OR,new UnaryExpression(booleanExpressions),null);
+            }else {
+                return lhsExpression;
             }
-            return lhsExpression;
         }
         return null;
     }
@@ -75,9 +81,13 @@ public class ExpressionBuilder {
                     !conditionalAndExpressionContext.connectorAnd().isEmpty() &&
                     null != conditionalAndExpressionContext.relationalExpression() &&
                     !conditionalAndExpressionContext.relationalExpression().isEmpty()) {
+                List<Expression> booleanExpressions = new ArrayList<>();
+                booleanExpressions.add(lhsExpression);
                 for (int i = 1; i < conditionalAndExpressionContext.relationalExpression().size(); i++) {
-                    lhsExpression = new ArithmeticComparisonExpression(ArithmeticOperator.AND, lhsExpression, processRelationalExpression(conditionalAndExpressionContext.relationalExpression().get(i)));
+                    Expression booleanExpression = processRelationalExpression(conditionalAndExpressionContext.relationalExpression().get(i));
+                    booleanExpressions.add(booleanExpression);
                 }
+                return new ArithmeticComparisonExpression(ArithmeticOperator.AND,new UnaryExpression(booleanExpressions),null);
             }
             return lhsExpression;
         }
@@ -94,7 +104,7 @@ public class ExpressionBuilder {
 
                 for (int i = 1; i < relationalExpressionContext.additiveExpression().size(); i++) {
                     BenefitParser.RelationalOpContext relationalOp = relationalExpressionContext.relationalOp(i-1);
-                    lhsExpression = new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOp), lhsExpression, processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i)));
+                    lhsExpression = new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOp,false), lhsExpression, processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i)));
                 }
             }
             return lhsExpression;
@@ -107,7 +117,7 @@ public class ExpressionBuilder {
 
                 for (int i = 0; i < relationalExpressionContext.additiveExpression().size(); i++) {
                     BenefitParser.RelationalOpContext relationalOp = relationalExpressionContext.relationalOp(i);
-                    lhsExpression = new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOp), lhsExpression, processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i)));
+                    lhsExpression = new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOp,true), lhsExpression, processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i)));
                 }
             }
             return lhsExpression;
@@ -115,19 +125,43 @@ public class ExpressionBuilder {
         return null;
     }
 
-    private ArithmeticOperator resolveOperatorForRelationalContext(BenefitParser.RelationalOpContext relationalOpContext) {
+    private ArithmeticOperator resolveOperatorForRelationalContext(BenefitParser.RelationalOpContext relationalOpContext,boolean isOperatorForLoopVariable) {
         if (null != relationalOpContext.EQUAL()) {
-            return ArithmeticOperator.EQUALTO;
+            if(isOperatorForLoopVariable){
+                return ArithmeticOperator.LOOPEQUALTO;
+            }else {
+                return ArithmeticOperator.EQUALTO;
+            }
         } else if (null != relationalOpContext.LT()) {
-            return ArithmeticOperator.LESSTHAN;
+            if(isOperatorForLoopVariable){
+                return ArithmeticOperator.LOOPLESSTHAN ;
+            }else {
+                return ArithmeticOperator.LESSTHAN;
+            }
         } else if (null != relationalOpContext.LE()) {
-            return ArithmeticOperator.LESSTHANEQUALTO;
+            if(isOperatorForLoopVariable){
+             return ArithmeticOperator.LOOPLESSTHANEQUALTO ;
+            }else {
+                return ArithmeticOperator.LESSTHANEQUALTO;
+            }
         } else if (null != relationalOpContext.GT()) {
-            return ArithmeticOperator.GREATERTHAN;
+            if(isOperatorForLoopVariable){
+                return ArithmeticOperator.LOOPGREATERTHAN ;
+            }else {
+                return ArithmeticOperator.GREATERTHAN;
+            }
         } else if (null != relationalOpContext.GE()) {
-            return ArithmeticOperator.GREATERTHANEQUALTO;
+            if(isOperatorForLoopVariable){
+                return ArithmeticOperator.LOOPGREATERTHANEQUALTO ;
+            }else {
+                return ArithmeticOperator.GREATERTHANEQUALTO;
+            }
         } else if (null != relationalOpContext.NOTEQUAL()) {
-            return ArithmeticOperator.NOTEQUALTO;
+            if(isOperatorForLoopVariable){
+                return ArithmeticOperator.LOOPNOTEQUALTO ;
+            }else {
+                return ArithmeticOperator.NOTEQUALTO;
+            }
         }
         return null;
     }
@@ -155,11 +189,11 @@ public class ExpressionBuilder {
                 if (null != rhsPrimaryContext.variableName()) {
                     String rhsVariableName = lhsPrimaryContext.variableName().getText();
                     Expression rhsVariableExpression = scheme.searchVariableExpression(rhsVariableName);
-                    return new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOpContext), lhsVariableExpression, rhsVariableExpression);
+                    return new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOpContext,true), lhsVariableExpression, rhsVariableExpression);
                 } else if (null != rhsPrimaryContext.literal()) {
                     Integer value = Integer.parseInt(rhsPrimaryContext.literal().NUMBER().getText());
                     UnaryExpression rhsUnaryExpression = new UnaryExpression(value);
-                    return new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOpContext), lhsVariableExpression, rhsUnaryExpression);
+                    return new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOpContext,true), lhsVariableExpression, rhsUnaryExpression);
                 }
             }
         }
@@ -242,7 +276,7 @@ public class ExpressionBuilder {
         if(null != iterativeAggregationExpressionContext.SUMOF() && null != iterativeAggregationExpressionContext.EACH()){
             if(null != iterativeAggregationExpressionContext.variableDeclarationStatement()){
                 String variableName = iterativeAggregationExpressionContext.variableDeclarationStatement().variableDeclaratorId().variableName().getText();
-                return scheme.searchVariableExpression(variableName);
+                return new ArithmeticExpression(ArithmeticOperator.LOOPADDITION, scheme.searchVariableExpression(variableName),null);
             }else if(null != iterativeAggregationExpressionContext.expression()){
                 BenefitParser.ExpressionContext expressionContext =iterativeAggregationExpressionContext.expression();
                 TerminalNode LHS_IDENTIFIER = expressionContext.conditionalExpression().conditionalOrExpression().conditionalAndExpression(0).relationalExpression(0).additiveExpression(0).multiplicativeExpression(0).unaryExpression(0).primary().variableName().IDENTIFIER();

@@ -1,24 +1,28 @@
 package com.affaince.benefit;
 
-import com.affaince.benefit.dummy.DummyEvent;
+import com.affaince.benefit.dummy.DummyEvent1;
+import com.affaince.benefit.dummy.DummyEvent2;
 import com.affaince.benefit.dummy.DummyEventProcessor;
 import com.affaince.benefit.processor.BenefitSchemeListener;
 import com.affaince.benefit.processor.SchemeExecutor;
-import com.affaince.benefit.scheme.*;
-import org.antlr.v4.runtime.*;
+import com.affaince.benefit.scheme.BenefitSchemeContext;
+import com.affaince.benefit.scheme.Scheme;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import javax.sound.midi.Soundbank;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class TestMain {
-    public static void main(String[] args){
-         execute();
+    public static void main(String[] args) {
+        execute();
     }
 
-    public static void execute(){
+    public static void execute() {
+
         String str = "given \n" +
                 "\t UNIT_SUBSCRIPTION_VALUE = 1000 ;\n" +
                 "\t UNIT_PERIOD_MONTH = 2 ;\n" +
@@ -37,10 +41,34 @@ public class TestMain {
                 "\t pay BENEFIT_VALUE\n" +
                 "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;";
 
-        DummyEvent dummyEvent = new DummyEvent(25000,12,12);
+/*
+        String str = "given \n" +
+                "\t VALUE_PER_POINT = 10 ;\n" +
+                "\t SUBSCRIPTION_RENEWAL_COUNT as input ;\n" +
+                "\t SUBSCRIPTION_PERIOD_PER_SUBSCRIPTION [] as input ;\n" +
+                "\t compute \n" +
+                "\t BENEFIT_COUNT = SUBSCRIPTION_RENEWAL_COUNT ;\n" +
+                "\t BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT ;\n" +
+                "\t TOTAL_SUBSCRIPTION_PERIOD =sumOf each SUBSCRIPTION_PERIOD_PER_SUBSCRIPTION ;\n" +
+                "\t eligibleWhen    \n" +
+                "\t SUBSCRIPTION_RENEWAL_COUNT > 3 and \n" +
+                "\t each SUBSCRIPTION_PERIOD_PER_SUBSCRIPTION >= 8 and  \n" +
+                "\t TOTAL_SUBSCRIPTION_PERIOD > 28	;\n" +
+                "\t pay BENEFIT_VALUE   \n" +
+                "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;";
+*/
+
+        DummyEvent1 dummyEvent1 = new DummyEvent1(25000, 12, 12);
+        List<Integer> list= new ArrayList<>();
+        list.add(12);
+        list.add(12);
+        list.add(12);
+        list.add(12);
+        list.add(12);
+        //DummyEvent2 dummyEvent2 = new DummyEvent2(5,list,12);
         DummyEventProcessor dummyEventProcessor = new DummyEventProcessor();
         Scheme scheme = new Scheme();
-        scheme = dummyEventProcessor.processDummyEvent(scheme,dummyEvent);
+        scheme = dummyEventProcessor.processDummyEvent(scheme, dummyEvent1);
 
 
         BenefitLexer lexer = new BenefitLexer(CharStreams.fromString(str));
@@ -50,7 +78,7 @@ public class TestMain {
         ParseTreeWalker walker = new ParseTreeWalker();
 
         BenefitSchemeListener listener = new BenefitSchemeListener(scheme);
-        walker.walk(listener,tree);
+        walker.walk(listener, tree);
         scheme = listener.getScheme();
         System.out.println("Scheme: " + scheme);
 
@@ -59,11 +87,11 @@ public class TestMain {
         print(benefitSchemeContext);
     }
 
-    public static void print(BenefitSchemeContext benefitSchemeContext){
+    public static void print(BenefitSchemeContext benefitSchemeContext) {
         System.out.println("***********LETS GO THROUGH INPUT,COMPUTED AND OUTPUT VALUES**********");
         System.out.println("***********************INPUT VALUES**********************************");
-        Map<String,Object>inputVariables  = benefitSchemeContext.getBenefitInputContext().getInputVariables();
-        for(Map.Entry<String,Object>inputEntry: inputVariables.entrySet()){
+        Map<String, Object> inputVariables = benefitSchemeContext.getBenefitInputContext().getInputVariables();
+        for (Map.Entry<String, Object> inputEntry : inputVariables.entrySet()) {
             System.out.print(" Input field: " + inputEntry.getKey());
             System.out.println(" input value: " + inputEntry.getValue());
         }
@@ -74,8 +102,8 @@ public class TestMain {
         System.out.println("total benefit value : " + outputContext.getBenefitValue());
         System.out.println("is vesting BEFORE stated delivery number?: " + outputContext.isBefore());
         System.out.println("benefit points vesting distribution list");
-        List<BenefitSchemeContext.BenefitOutputContext.BenefitVestingDistribution> benefitVestingDistributionList =   outputContext.getBenefitVestingDistributionList();
-        for(BenefitSchemeContext.BenefitOutputContext.BenefitVestingDistribution distribution: benefitVestingDistributionList){
+        List<BenefitSchemeContext.BenefitOutputContext.BenefitVestingDistribution> benefitVestingDistributionList = outputContext.getBenefitVestingDistributionList();
+        for (BenefitSchemeContext.BenefitOutputContext.BenefitVestingDistribution distribution : benefitVestingDistributionList) {
             System.out.print(" BEFORE/AFTER " + distribution.getDeliveryNumber() + " delivery,");
             System.out.println(" Vest " + distribution.getBenefitValueToBeVested() + " points");
         }

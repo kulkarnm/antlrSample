@@ -1,11 +1,11 @@
 package com.affaince.benefit.dummy;
 
-public class DummyEvent {
+public class DummyEvent1 {
     private double subscriptionValue;
     private int subscriptionPeriod;
     private int totalDeliveries;
 
-    public DummyEvent(double subscriptionValue, int subscriptionPeriod, int totalDeliveries) {
+    public DummyEvent1(double subscriptionValue, int subscriptionPeriod, int totalDeliveries) {
         this.subscriptionValue = subscriptionValue;
         this.subscriptionPeriod = subscriptionPeriod;
         this.totalDeliveries = totalDeliveries;
