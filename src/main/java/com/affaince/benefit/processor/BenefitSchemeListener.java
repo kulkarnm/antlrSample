@@ -40,7 +40,7 @@ public class BenefitSchemeListener extends BenefitBaseListener {
     @Override public void exitEligibilityUnit(BenefitParser.EligibilityUnitContext ctx) {
         List<BenefitParser.BlockStatementContext> blockStatementContexts =ctx.block().blockStatement();
         for(BenefitParser.BlockStatementContext blockStatementContext:blockStatementContexts){
-            scheme.getEligibilityUnit().addExpression(expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression()));
+            scheme.getEligibilityUnit().setExpression(expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression()));
         }
         System.out.println("exit eligibility unit");
     }
