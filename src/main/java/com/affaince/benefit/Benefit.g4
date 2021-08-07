@@ -308,6 +308,7 @@ StringCharacter
 fragment
 EscapeSequence
 	:	'\\' [btnfr"'\\]
+	//:   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
 	;
 //Identifiers (must appear after all keywords in the grammar)
 IDENTIFIER

@@ -1,7 +1,9 @@
 package com.affaince.benefit.scheme;
 
 
+import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class StringComparisonExpression extends Expression {
     public StringComparisonExpression(ArithmeticOperator operator, Expression leftHandSide, Expression rightHandSide) {
@@ -12,20 +14,29 @@ public class StringComparisonExpression extends Expression {
     private Object executeBiFunction(BiFunction<Expression,Expression,?> biFunction){
         return biFunction.apply(getLeftHandSide(), getRightHandSide());
     }
+    private Object executeFunction(Function<Expression, ?> function) {
+        return function.apply(getLeftHandSide());
+    }
+
     public Object apply(){
         switch (this.getOperator()){
             case EQUALTO:
-                BiFunction<Expression,Expression,?> equalTo = (a,b) -> a.apply().toString().equals(b.apply().toString()) ;
+                BiFunction<Expression,Expression,?> equalTo = (a,b) -> ((String)(a.apply())).equals((String)(b.apply())) ;
                 return executeBiFunction(equalTo);
             case NOTEQUALTO:
-                BiFunction<Expression,Expression,?> notEqualTo = (a,b) ->!a.apply().toString().equals(b.apply().toString()) ;
+                BiFunction<Expression,Expression,?> notEqualTo = (a,b) ->!((String)(a.apply())).equals((String)(b.apply())) ;
                 return executeBiFunction(notEqualTo);
             case AND:
-                BiFunction<Expression,Expression,?> andTwoExpressions = (a,b)->((Boolean)a.apply()).booleanValue() && ((Boolean)b.apply()).booleanValue() ;
-                return executeBiFunction(andTwoExpressions);
+                Function<Expression,?> andExpressions = (a) -> ((List<Expression>)(a.apply()))
+                        .stream().map(element->(Boolean)element.apply())
+                        .reduce((p,q)-> p && q).orElse(false) ;   //.stream().reduce(Boolean::logicalAnd).orElse(false);
+                return executeFunction(andExpressions);
             case OR :
-                BiFunction<Expression,Expression,?> orTwoExpressions = (a,b)->((Boolean)a.apply()).booleanValue() || ((Boolean)b.apply()).booleanValue() ;
-                return executeBiFunction(orTwoExpressions);
+                Function<Expression,?> orExpressions = (a) -> ((List<Expression>)(a.apply()))
+                        .stream().map(element->(Boolean)element.apply())
+                        .reduce((p,q)-> p || q).orElse(false) ;   //.stream().reduce(Boolean::logicalAnd).orElse(false);
+
+                return executeFunction(orExpressions);
             default:
                 throw new IllegalStateException("Unexpected value: " + this.getOperator());
         }

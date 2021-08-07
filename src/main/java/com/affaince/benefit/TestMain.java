@@ -1,9 +1,6 @@
 package com.affaince.benefit;
 
-import com.affaince.benefit.dummy.DummyEvent1;
-import com.affaince.benefit.dummy.DummyEvent2;
-import com.affaince.benefit.dummy.DummyEvent3;
-import com.affaince.benefit.dummy.DummyEventProcessor;
+import com.affaince.benefit.dummy.*;
 import com.affaince.benefit.processor.BenefitSchemeListener;
 import com.affaince.benefit.processor.SchemeExecutor;
 import com.affaince.benefit.scheme.BenefitSchemeContext;
@@ -23,7 +20,23 @@ public class TestMain {
     }
 
     public static void execute() {
-        String str3 = "given \n" +
+        String str4 = " given \n" +
+        "\t VALUE_PER_POINT = 10 ;\n" +
+        "\t PRODUCT_SUBSCRIPTION_COUNT_PER_SUBSCRIPTION[] as input ;\n" +
+        "\t PRODUCT_ID as input ;\n" +
+        "\t \n" +
+        "\t compute\n" +
+        "\t         BENEFIT_COUNT = sumOf each PRODUCT_SUBSCRIPTION_COUNT_PER_SUBSCRIPTION ;\n" +
+        "\t BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT ;\n" +
+        "\t \n" +
+        "\t eligibleWhen \n" +
+        "\t PRODUCT_ID == \"Product1\" ;\n" +
+        "\t \n" +
+        "\t pay BENEFIT_VALUE \n" +
+        "\t after 1/4, 1/2, 3/4  of TOTAL_DELIVERIES in default proportion ;" ;
+
+
+ /*       String str3 = "given \n" +
         "\t VALUE_PER_POINT = 100 ;\n" +
         "\t SUBSCRIPTION_RENEWAL_COUNT as input ;\n" +
         "\t SUBSCRIPTION_PERIOD[] as input ;\n" +
@@ -34,7 +47,7 @@ public class TestMain {
         "\t SUBSCRIPTION_RENEWAL_COUNT > 3 and \n" +
         "\t each SUBSCRIPTION_PERIOD >= 8 ;\n" +
         "\t pay BENEFIT_VALUE \n" +
-        "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in 2:3:4 proportion ;";
+        "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in 2:3:4 proportion ;";*/
 
 
 /*        String str = "given \n" +
@@ -80,13 +93,14 @@ public class TestMain {
         list.add(8);
         list.add(8);
         //DummyEvent2 dummyEvent2 = new DummyEvent2(5,list,12);
-        DummyEvent3 dummyEvent3 = new DummyEvent3(5,list,12) ;
+        //DummyEvent3 dummyEvent3 = new DummyEvent3(5,list,12) ;
+        DummyEvent4 dummyEvent4 = new DummyEvent4(list,"Product1",10);
         DummyEventProcessor dummyEventProcessor = new DummyEventProcessor();
         Scheme scheme = new Scheme();
-        scheme = dummyEventProcessor.processDummyEvent(scheme, dummyEvent3);
+        scheme = dummyEventProcessor.processDummyEvent(scheme, dummyEvent4);
 
 
-        BenefitLexer lexer = new BenefitLexer(CharStreams.fromString(str3));
+        BenefitLexer lexer = new BenefitLexer(CharStreams.fromString(str4));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         BenefitParser parser = new BenefitParser(tokens);
         ParseTree tree = parser.scheme();

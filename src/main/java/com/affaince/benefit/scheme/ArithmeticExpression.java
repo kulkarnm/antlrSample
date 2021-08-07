@@ -41,7 +41,7 @@ public class ArithmeticExpression extends Expression {
                 return executeBiFunction(mod);
             case TERNARY:
                 ArithmeticComparisonExpression conditionalExpression = (ArithmeticComparisonExpression)this.getPreExpression();
-                BiFunction<Expression, Expression, ?> ternary = (a, b) -> new UnaryExpression((Boolean)conditionalExpression.apply() ? ((Number) a.apply()).doubleValue() : ((Number) b.apply()).doubleValue());
+                BiFunction<Expression, Expression, ?> ternary = (a, b) -> new UnaryExpression((Boolean)conditionalExpression.apply() ? ((Number) a.apply()).doubleValue() : ((Number) b.apply()).doubleValue(),UnaryType.NUMBER);
                 if(this.getLeftHandSide().apply() instanceof Number) {
                     if(this.getRightHandSide().apply() instanceof  Number) {
                         ternary = (a, b) -> (Boolean)conditionalExpression.apply() ? ((Number) a.apply()).doubleValue() : ((Number) b.apply()).doubleValue();

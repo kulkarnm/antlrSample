@@ -1,9 +1,6 @@
 package com.affaince.benefit.dummy;
 
-import com.affaince.benefit.scheme.Scheme;
-import com.affaince.benefit.scheme.UnaryExpression;
-import com.affaince.benefit.scheme.VariableExpression;
-import com.affaince.benefit.scheme.VariableIdentifierExpression;
+import com.affaince.benefit.scheme.*;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -18,12 +15,13 @@ public class DummyEventProcessor {
             for (Field eventField : eventFields) {
                 eventField.setAccessible(true);
                 String str = eventField.getName();
+                Class type =eventField.getType();
                 str = str.replaceAll("([^A-Z])([A-Z0-9])", "$1_$2") // standard replace
                         .replaceAll("([A-Z]+)([A-Z0-9][^A-Z]+)", "$1_$2") // last letter after full uppercase.
                         .replaceAll("([0-9]+)([a-zA-Z]+)", "$1_$2").toLowerCase(); // letters after numbers
                 str = str.toUpperCase();
                 Object value = eventField.get(dummyEvent2);
-                VariableExpression variableExpression = new VariableExpression(new VariableIdentifierExpression(str),new UnaryExpression(value));
+                VariableExpression variableExpression = new VariableExpression(new VariableIdentifierExpression(str),new UnaryExpression(value,UnaryExpression.obtainUnaryType(type)));
                 scheme.getGivenUnit().addExpression(variableExpression);
             }
         }catch(IllegalAccessException ex){
@@ -31,4 +29,5 @@ public class DummyEventProcessor {
         }
         return scheme;
     }
+
 }

@@ -65,7 +65,7 @@ public class ExpressionBuilder {
                     Expression booleanExpression = processConditionalAndExpression(conditionalOrExpressionContext.conditionalAndExpression().get(i));
                     booleanExpressions.add(booleanExpression);
                 }
-                return new ArithmeticComparisonExpression(ArithmeticOperator.OR,new UnaryExpression(booleanExpressions),null);
+                return new ArithmeticComparisonExpression(ArithmeticOperator.OR,new UnaryExpression(booleanExpressions,UnaryType.OBJECT),null);
             }else {
                 return lhsExpression;
             }
@@ -87,7 +87,7 @@ public class ExpressionBuilder {
                     Expression booleanExpression = processRelationalExpression(conditionalAndExpressionContext.relationalExpression().get(i));
                     booleanExpressions.add(booleanExpression);
                 }
-                return new ArithmeticComparisonExpression(ArithmeticOperator.AND,new UnaryExpression(booleanExpressions),null);
+                return new ArithmeticComparisonExpression(ArithmeticOperator.AND,new UnaryExpression(booleanExpressions,UnaryType.OBJECT),null);
             }
             return lhsExpression;
         }
@@ -104,7 +104,14 @@ public class ExpressionBuilder {
 
                 for (int i = 1; i < relationalExpressionContext.additiveExpression().size(); i++) {
                     BenefitParser.RelationalOpContext relationalOp = relationalExpressionContext.relationalOp(i-1);
-                    lhsExpression = new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOp,false), lhsExpression, processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i)));
+                    Expression rhsExpression = processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i));
+                    if(rhsExpression instanceof UnaryExpression){
+                        if(((UnaryExpression)rhsExpression).getType() == UnaryType.NUMBER){
+                            lhsExpression = new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOp,false), lhsExpression,rhsExpression );
+                        }else {
+                            lhsExpression = new StringComparisonExpression(resolveOperatorForRelationalContext(relationalOp,false), lhsExpression,rhsExpression );
+                        }
+                    }
                 }
             }
             return lhsExpression;
@@ -117,7 +124,15 @@ public class ExpressionBuilder {
 
                 for (int i = 0; i < relationalExpressionContext.additiveExpression().size(); i++) {
                     BenefitParser.RelationalOpContext relationalOp = relationalExpressionContext.relationalOp(i);
-                    lhsExpression = new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOp,true), lhsExpression, processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i)));
+                    Expression rhsExpression = processAdditiveExpression(relationalExpressionContext.additiveExpression().get(i));
+                    if(rhsExpression instanceof UnaryExpression){
+                        if(((UnaryExpression)rhsExpression).getType() == UnaryType.NUMBER){
+                            lhsExpression = new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOp,false), lhsExpression,rhsExpression );
+                        }else {
+                            lhsExpression = new StringComparisonExpression(resolveOperatorForRelationalContext(relationalOp,false), lhsExpression,rhsExpression );
+                        }
+                    }
+
                 }
             }
             return lhsExpression;
@@ -192,7 +207,7 @@ public class ExpressionBuilder {
                     return new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOpContext,true), lhsVariableExpression, rhsVariableExpression);
                 } else if (null != rhsPrimaryContext.literal()) {
                     Integer value = Integer.parseInt(rhsPrimaryContext.literal().NUMBER().getText());
-                    UnaryExpression rhsUnaryExpression = new UnaryExpression(value);
+                    UnaryExpression rhsUnaryExpression = new UnaryExpression(value,UnaryType.NUMBER);
                     return new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOpContext,true), lhsVariableExpression, rhsUnaryExpression);
                 }
             }
@@ -208,7 +223,7 @@ public class ExpressionBuilder {
             Expression expression = processExpression(initializerContext.expression());
             arrayElements.add(expression);
         }
-        return new VariableExpression(new VariableIdentifierExpression(variableName),new UnaryExpression(arrayElements));
+        return new VariableExpression(new VariableIdentifierExpression(variableName),new UnaryExpression(arrayElements,UnaryType.OBJECT));
     }
 
     private Expression buildNonArrayVariable(String variableName, BenefitParser.VariableInitializerContext variableInitializerContext) {
@@ -326,29 +341,39 @@ public class ExpressionBuilder {
         }
         return null;
     }
-
+    private String escapeDoubleDoubleQuotesFromString(String literalStringValue){
+       // String s = getText();
+        char[] literalCharArray = literalStringValue.toCharArray();
+        if(literalCharArray[0]=='"') {
+            literalStringValue = literalStringValue.substring(1, literalStringValue.length() - 1); // strip the leading and trailing quotes
+            literalStringValue = literalStringValue.replace("\"\"", "\""); // replace all double quotes with single quotes
+            System.out.println("^^^^changed value :  " + literalStringValue);
+        }
+        return literalStringValue;
+    }
     Expression processUnaryExpression(BenefitParser.UnaryExpressionContext unaryExpressionContext) {
         BenefitParser.LiteralContext literalContext = unaryExpressionContext.primary().literal();
         if (null != literalContext) {
             if (null != literalContext.NUMBER()) {
                 Number literalNumericValue = Double.parseDouble(literalContext.NUMBER().getText());
-                return  new UnaryExpression(literalNumericValue);
+                return  new UnaryExpression(literalNumericValue,UnaryType.NUMBER);
             } else if (null != literalContext.StringLiteral()) {
-                String literalStringValue = literalContext.StringLiteral().getText();
-                return new UnaryExpression(literalStringValue);
+                String literalStringValue = literalContext.StringLiteral().getSymbol().getText();
+                System.out.println("^^Unchanged : " + literalStringValue);
+                return new UnaryExpression(escapeDoubleDoubleQuotesFromString(literalStringValue),UnaryType.STRING);
             } else if (null != literalContext.BooleanLiteral()) {
                 Boolean literalBooleanValue = Boolean.parseBoolean(literalContext.BooleanLiteral().getText());
-                return new UnaryExpression(literalBooleanValue);
+                return new UnaryExpression(literalBooleanValue,UnaryType.BOOLEAN);
             } else {
                 String literalStringValue = literalContext.NullLiteral().getText();
-                return new UnaryExpression(literalStringValue);
+                return new UnaryExpression(literalStringValue,UnaryType.NULL);
             }
         } else if (null != unaryExpressionContext.primary().variableName()) {
             Expression variableExpression = scheme.searchVariableExpression(unaryExpressionContext.primary().variableName().getText());
             if( null != variableExpression){
                 return variableExpression;
             }else{
-                variableExpression= new VariableExpression(new VariableIdentifierExpression(unaryExpressionContext.primary().variableName().getText()),new UnaryExpression(null));
+                variableExpression= new VariableExpression(new VariableIdentifierExpression(unaryExpressionContext.primary().variableName().getText()),new UnaryExpression(null,UnaryType.NULL));
                 //scheme.getComputeUnit().addExpression(variableExpression);
                 return  variableExpression;
             }

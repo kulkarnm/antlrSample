@@ -30,7 +30,7 @@ public class ComputeUnit {
         for (Expression expression : expressionQueue) {
             String variableName = (String) expression.getLeftHandSide().getLeftHandSide().apply();
             Object variableValue = expression.getRightHandSide().apply();
-            UnaryExpression valueExpression = new UnaryExpression(variableValue);
+            UnaryExpression valueExpression = new UnaryExpression(variableValue,UnaryExpression.obtainUnaryType(variableValue.getClass()));
             expression.setRightHandSide(valueExpression);
             updateAllVariableReferences(variableName,valueExpression);
             benefitSchemeContext.addToInputVariables(variableName, variableValue);

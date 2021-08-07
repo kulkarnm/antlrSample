@@ -63,7 +63,7 @@ public class PaymentExpressionBuilder {
             for (int i =0; i < vestingCount; i++) {
                 Expression vestingPeriodicityExpression = paymentExpression.getVestingPeriodicityExpressions().get(i);
                 Expression expression = new ArithmeticExpression(ArithmeticOperator.MULTIPLICATION,
-                        new ArithmeticExpression(ArithmeticOperator.DIVISION, new UnaryExpression(1), new UnaryExpression(vestingCount)),
+                        new ArithmeticExpression(ArithmeticOperator.DIVISION, new UnaryExpression(1,UnaryType.NUMBER), new UnaryExpression(vestingCount,UnaryType.NUMBER)),
                         paymentExpression.getPayableVariable());
                 deliveryWiseDistributionExpressions.put(vestingPeriodicityExpression,expression);
             }
@@ -73,7 +73,7 @@ public class PaymentExpressionBuilder {
             for (int i = 0; i < vestingCount; i++) {
                 Expression vestingPeriodicityExpression = paymentExpression.getVestingPeriodicityExpressions().get(i);
                 Expression expression = new ArithmeticExpression(ArithmeticOperator.MULTIPLICATION,
-                        new ArithmeticExpression(ArithmeticOperator.DIVISION, new UnaryExpression(Integer.parseInt(proportionNumbers.get(i).getText())), new UnaryExpression(proportionSum)),
+                        new ArithmeticExpression(ArithmeticOperator.DIVISION, new UnaryExpression(Integer.parseInt(proportionNumbers.get(i).getText()),UnaryType.NUMBER), new UnaryExpression(proportionSum,UnaryType.NUMBER)),
                         paymentExpression.getPayableVariable());
                 deliveryWiseDistributionExpressions.put(vestingPeriodicityExpression,expression);
             }
