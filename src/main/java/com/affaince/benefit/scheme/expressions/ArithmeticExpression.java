@@ -1,4 +1,4 @@
-package com.affaince.benefit.scheme;
+package com.affaince.benefit.scheme.expressions;
 
 
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class ArithmeticExpression extends Expression {
+    public ArithmeticExpression(){super();}
     public ArithmeticExpression(ArithmeticOperator operator, Expression leftHandSide, Expression rightHandSide) {
         super(operator, leftHandSide, rightHandSide);
     }
@@ -41,7 +42,7 @@ public class ArithmeticExpression extends Expression {
                 return executeBiFunction(mod);
             case TERNARY:
                 ArithmeticComparisonExpression conditionalExpression = (ArithmeticComparisonExpression)this.getPreExpression();
-                BiFunction<Expression, Expression, ?> ternary = (a, b) -> new UnaryExpression((Boolean)conditionalExpression.apply() ? ((Number) a.apply()).doubleValue() : ((Number) b.apply()).doubleValue(),UnaryType.NUMBER);
+                BiFunction<Expression, Expression, ?> ternary = (a, b) -> new UnaryExpression((Boolean)conditionalExpression.apply() ? ((Number) a.apply()).doubleValue() : ((Number) b.apply()).doubleValue(), UnaryType.NUMBER);
                 if(this.getLeftHandSide().apply() instanceof Number) {
                     if(this.getRightHandSide().apply() instanceof  Number) {
                         ternary = (a, b) -> (Boolean)conditionalExpression.apply() ? ((Number) a.apply()).doubleValue() : ((Number) b.apply()).doubleValue();

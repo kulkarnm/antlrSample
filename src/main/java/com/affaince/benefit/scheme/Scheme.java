@@ -1,5 +1,14 @@
 package com.affaince.benefit.scheme;
 
+import com.affaince.benefit.scheme.compilation.units.ComputeUnit;
+import com.affaince.benefit.scheme.compilation.units.EligibilityUnit;
+import com.affaince.benefit.scheme.compilation.units.GivenUnit;
+import com.affaince.benefit.scheme.compilation.units.PayUnit;
+import com.affaince.benefit.scheme.expressions.Expression;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+@JsonIdentityInfo(generator= ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class Scheme {
     private GivenUnit givenUnit;
     private ComputeUnit computeUnit;
@@ -11,7 +20,7 @@ public class Scheme {
         givenUnit = new GivenUnit();
         computeUnit = new ComputeUnit();
         eligibilityUnit= new EligibilityUnit();
-        payUnit=new PayUnit(givenUnit,computeUnit);
+        payUnit=new PayUnit();
     }
 
     public Expression searchVariableExpression(String variableName){

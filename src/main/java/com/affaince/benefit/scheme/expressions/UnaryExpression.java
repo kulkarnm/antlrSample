@@ -1,10 +1,10 @@
-package com.affaince.benefit.scheme;
+package com.affaince.benefit.scheme.expressions;
 
 
 public class UnaryExpression extends Expression{
     private Object value;
     private UnaryType type;
-
+    public UnaryExpression() { super();}
     public UnaryExpression(Object value,UnaryType type) {
         super(null,null,null);
         this.value=value;

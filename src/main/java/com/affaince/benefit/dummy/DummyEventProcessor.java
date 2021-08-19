@@ -1,6 +1,9 @@
 package com.affaince.benefit.dummy;
 
 import com.affaince.benefit.scheme.*;
+import com.affaince.benefit.scheme.expressions.UnaryExpression;
+import com.affaince.benefit.scheme.expressions.VariableExpression;
+import com.affaince.benefit.scheme.expressions.VariableIdentifierExpression;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

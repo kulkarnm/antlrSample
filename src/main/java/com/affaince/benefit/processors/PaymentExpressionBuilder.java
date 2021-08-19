@@ -1,7 +1,9 @@
-package com.affaince.benefit.processor;
+package com.affaince.benefit.processors;
 
 import com.affaince.benefit.BenefitParser;
 import com.affaince.benefit.scheme.*;
+import com.affaince.benefit.scheme.expressions.*;
+import com.affaince.benefit.scheme.vo.VestingDistribution;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class PaymentExpressionBuilder {
         paymentExpression.setPrecedence(buildPaymentPrecedence(payUnitContext));
         paymentExpression.setMultiplierVariable(buildMultiplierVariable(payUnitContext));
         paymentExpression.setVestingPeriodicityExpressions(buildVestingPeriodicityExpressions(payUnitContext,paymentExpression));
-        paymentExpression.setVestingDistributionExpressions(buildVestingDistributionExpressions(payUnitContext,paymentExpression));
+        paymentExpression.setVestingDistributions(buildVestingDistributionExpressions(payUnitContext,paymentExpression));
         return paymentExpression;
     }
 
@@ -55,17 +57,17 @@ public class PaymentExpressionBuilder {
         return scheme.searchVariableExpression(payUnitContext.variableName().get(1).getText());
     }
 
-    private Map<Expression,Expression> buildVestingDistributionExpressions(BenefitParser.PayUnitContext payUnitContext, PaymentExpression paymentExpression) {
+    private List<VestingDistribution> buildVestingDistributionExpressions(BenefitParser.PayUnitContext payUnitContext, PaymentExpression paymentExpression) {
         BenefitParser.ProportionExpressionContext proportionExpressionContext = payUnitContext.proportionExpression();
         int vestingCount = paymentExpression.getVestingPeriodicityExpressions().size();
-        Map<Expression,Expression> deliveryWiseDistributionExpressions = new HashMap<>();
+        List<VestingDistribution> deliveryWiseDistributionExpressions = new ArrayList<>();
         if (null != proportionExpressionContext.DEFAULT()) {
             for (int i =0; i < vestingCount; i++) {
                 Expression vestingPeriodicityExpression = paymentExpression.getVestingPeriodicityExpressions().get(i);
                 Expression expression = new ArithmeticExpression(ArithmeticOperator.MULTIPLICATION,
                         new ArithmeticExpression(ArithmeticOperator.DIVISION, new UnaryExpression(1,UnaryType.NUMBER), new UnaryExpression(vestingCount,UnaryType.NUMBER)),
                         paymentExpression.getPayableVariable());
-                deliveryWiseDistributionExpressions.put(vestingPeriodicityExpression,expression);
+                deliveryWiseDistributionExpressions.add(new VestingDistribution(vestingPeriodicityExpression,expression));
             }
         } else {
             List<TerminalNode> proportionNumbers = payUnitContext.proportionExpression().nonDefaultProportionExpression().NUMBER();
@@ -75,7 +77,7 @@ public class PaymentExpressionBuilder {
                 Expression expression = new ArithmeticExpression(ArithmeticOperator.MULTIPLICATION,
                         new ArithmeticExpression(ArithmeticOperator.DIVISION, new UnaryExpression(Integer.parseInt(proportionNumbers.get(i).getText()),UnaryType.NUMBER), new UnaryExpression(proportionSum,UnaryType.NUMBER)),
                         paymentExpression.getPayableVariable());
-                deliveryWiseDistributionExpressions.put(vestingPeriodicityExpression,expression);
+                deliveryWiseDistributionExpressions.add(new VestingDistribution(vestingPeriodicityExpression,expression));
             }
         }
         return deliveryWiseDistributionExpressions;

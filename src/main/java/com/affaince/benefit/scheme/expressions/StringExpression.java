@@ -1,10 +1,10 @@
-package com.affaince.benefit.scheme;
+package com.affaince.benefit.scheme.expressions;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class StringExpression extends Expression  {
-
+    public StringExpression(){super();}
     public StringExpression(ArithmeticOperator operator, Expression leftHandSide, Expression rightHandSide) {
         super(operator, leftHandSide, rightHandSide);
     }

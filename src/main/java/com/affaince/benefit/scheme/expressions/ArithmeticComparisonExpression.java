@@ -1,4 +1,4 @@
-package com.affaince.benefit.scheme;
+package com.affaince.benefit.scheme.expressions;
 
 
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class ArithmeticComparisonExpression extends Expression {
+    public ArithmeticComparisonExpression(){super();}
     public ArithmeticComparisonExpression(ArithmeticOperator operator, Expression leftHandSide, Expression rightHandSide) {
         super(operator, leftHandSide, rightHandSide);
     }

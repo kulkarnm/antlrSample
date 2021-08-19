@@ -1,17 +1,17 @@
 package com.affaince.benefit;
 
 import com.affaince.benefit.dummy.*;
-import com.affaince.benefit.processor.BenefitSchemeListener;
-import com.affaince.benefit.processor.SchemeExecutor;
+import com.affaince.benefit.processors.BenefitSchemeListener;
+import com.affaince.benefit.processors.SchemeExecutor;
 import com.affaince.benefit.scheme.BenefitSchemeContext;
 import com.affaince.benefit.scheme.Scheme;
+import com.affaince.benefit.serde.SchemeDeserializer;
+import com.affaince.benefit.serde.SchemeSerializer;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -128,11 +128,23 @@ public class TestMain {
         BenefitSchemeListener listener = new BenefitSchemeListener(scheme);
         walker.walk(listener, tree);
         scheme = listener.getScheme();
-        System.out.println("Scheme: " + scheme);
+
+/*        SchemeExecutor schemeExecutor = new SchemeExecutor();
+        BenefitSchemeContext benefitSchemeContext = schemeExecutor.executeScheme(scheme);
+        print(benefitSchemeContext);*/
+
+        SchemeSerializer serializer = new SchemeSerializer();
+        String schemeString = serializer.serialize(scheme);
+
+        System.out.println(schemeString);
+        SchemeDeserializer deserializer = new SchemeDeserializer();
+        Scheme scheme2 = deserializer.deserialize(schemeString);
 
         SchemeExecutor schemeExecutor = new SchemeExecutor();
-        BenefitSchemeContext benefitSchemeContext = schemeExecutor.executeScheme(scheme);
-        print(benefitSchemeContext);
+        BenefitSchemeContext benefitSchemeContext2 = schemeExecutor.executeScheme(scheme2);
+        print(benefitSchemeContext2);
+
+
     }
 
     public static void print(BenefitSchemeContext benefitSchemeContext) {

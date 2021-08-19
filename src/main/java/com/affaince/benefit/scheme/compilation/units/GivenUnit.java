@@ -1,8 +1,13 @@
-package com.affaince.benefit.scheme;
+package com.affaince.benefit.scheme.compilation.units;
+
+import com.affaince.benefit.scheme.BenefitSchemeContext;
+import com.affaince.benefit.scheme.expressions.Expression;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.util.LinkedList;
 import java.util.List;
-
+@JsonIdentityInfo(generator= ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class GivenUnit {
     private LinkedList<Expression> expressionQueue;
 
@@ -20,13 +25,6 @@ public class GivenUnit {
 
     public LinkedList<Expression> getExpressionQueue() {
         return expressionQueue;
-    }
-
-    public Expression viewNextExpression(){
-        return expressionQueue.peek();
-    }
-    public Expression getNextExpression(){
-        return expressionQueue.poll();
     }
 
     public void execute(BenefitSchemeContext benefitSchemeContext){

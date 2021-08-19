@@ -1,16 +1,19 @@
-package com.affaince.benefit.scheme;
+package com.affaince.benefit.scheme.compilation.units;
 
-import java.util.LinkedList;
+import com.affaince.benefit.scheme.BenefitSchemeContext;
+import com.affaince.benefit.scheme.expressions.Expression;
+import com.affaince.benefit.scheme.expressions.PaymentExpression;
+import com.affaince.benefit.scheme.expressions.PaymentPrecedence;
+import com.affaince.benefit.scheme.vo.VestingDistribution;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.util.List;
 import java.util.Map;
-
+@JsonIdentityInfo(generator= ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class PayUnit {
     private PaymentExpression paymentExpression;
-    private GivenUnit givenUnit;
-    private ComputeUnit computeUnit;
-    public PayUnit(GivenUnit givenUnit,ComputeUnit computeUnit) {
-        this.givenUnit = givenUnit;
-        this.computeUnit = computeUnit;
+    public PayUnit() {
     }
     public Expression searchVariableExpression(String variableName) {
         if(null != paymentExpression){
@@ -34,8 +37,8 @@ public class PayUnit {
          if(paymentPrecedence==PaymentPrecedence.BEFORE){
              benefitSchemeContext.setBefore(true);
          }
-         Map<Expression,Expression> vestingDistributionExpressions = paymentExpression.getVestingDistributionExpressions();
-         for(Map.Entry<Expression,Expression> deliveryWiseBenefitTuple: vestingDistributionExpressions.entrySet()){
+         List<VestingDistribution> vestingDistributions = paymentExpression.getVestingDistributions();
+         for(VestingDistribution deliveryWiseBenefitTuple: vestingDistributions){
             benefitSchemeContext.addToBenefitVestingDistributionList((Double)deliveryWiseBenefitTuple.getKey().apply(),(Double)deliveryWiseBenefitTuple.getValue().apply());
          }
     }
@@ -43,4 +46,6 @@ public class PayUnit {
     public void syncAllVariableReferences(GivenUnit givenUnit,ComputeUnit computeUnit){
         this.paymentExpression.syncAllVariableReferences(givenUnit,computeUnit);
     }
+
+
 }

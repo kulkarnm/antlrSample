@@ -1,4 +1,4 @@
-package com.affaince.benefit.processor;
+package com.affaince.benefit.processors;
 
 import com.affaince.benefit.BenefitBaseListener;
 import com.affaince.benefit.BenefitParser;

@@ -1,20 +1,26 @@
-package com.affaince.benefit.scheme;
+package com.affaince.benefit.scheme.expressions;
+
+import com.affaince.benefit.scheme.compilation.units.ComputeUnit;
+import com.affaince.benefit.scheme.compilation.units.GivenUnit;
+import com.affaince.benefit.scheme.vo.VestingDistribution;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.util.*;
-
 public class PaymentExpression {
     private Expression payableVariable;
     private PaymentPrecedence precedence;
     private List<Expression> vestingPeriodicityExpressions;
     private Expression multiplierVariable;
-    private Map<Expression,Expression> vestingDistributionExpressions;
+    private List<VestingDistribution> vestingDistributions;
 
     public PaymentExpression(){
         vestingPeriodicityExpressions = new ArrayList<>();
-        vestingDistributionExpressions = new HashMap<>();
+        vestingDistributions = new ArrayList<>();
     }
 
-    public void syncAllVariableReferences(GivenUnit givenUnit,ComputeUnit computeUnit) {
+    public void syncAllVariableReferences(GivenUnit givenUnit, ComputeUnit computeUnit) {
         //payableVariable
         Expression valuedVariableExpression = searchVariableExpressionByName((String)payableVariable.getLeftHandSide().apply(),givenUnit,computeUnit);
         if(null != valuedVariableExpression) {
@@ -30,7 +36,7 @@ public class PaymentExpression {
                 vestingPeriodicityExpression.getRightHandSide().setRightHandSide(valuedVariableExpression.getRightHandSide());
             }
         }
-        for(Map.Entry<Expression,Expression> vestingDistributionExpressionEntry : vestingDistributionExpressions.entrySet()){
+        for(VestingDistribution vestingDistributionExpressionEntry : vestingDistributions){
             Expression vestingPeriodicityExpression = vestingDistributionExpressionEntry.getKey();
             valuedVariableExpression = searchVariableExpressionByName((String)vestingPeriodicityExpression.getRightHandSide().getLeftHandSide().apply(),givenUnit,computeUnit);
             if(null != valuedVariableExpression){
@@ -82,9 +88,6 @@ public class PaymentExpression {
         return vestingPeriodicityExpressions;
     }
 
-    public Map<Expression,Expression> getVestingDistributionExpressions() {
-        return vestingDistributionExpressions;
-    }
 
     public void setPayableVariable(Expression payableVariable) {
         this.payableVariable = payableVariable;
@@ -102,8 +105,12 @@ public class PaymentExpression {
         this.vestingPeriodicityExpressions = vestingPeriodicityExpressions;
     }
 
-    public void setVestingDistributionExpressions(Map<Expression,Expression> vestingDistributionExpressions) {
-        this.vestingDistributionExpressions = vestingDistributionExpressions;
+    public List<VestingDistribution> getVestingDistributions() {
+        return vestingDistributions;
+    }
+
+    public void setVestingDistributions(List<VestingDistribution> vestingDistributions) {
+        this.vestingDistributions = vestingDistributions;
     }
 
     public Expression getMultiplierVariable() {

@@ -1,8 +1,11 @@
-package com.affaince.benefit.scheme;
+package com.affaince.benefit.scheme.expressions;
 
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class VariableIdentifierExpression extends Expression {
     private String identifier;
+    public VariableIdentifierExpression(){super();}
     public VariableIdentifierExpression(String identifier) {
         super(null,null,null);
         this.identifier=identifier;
