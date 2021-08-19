@@ -40,7 +40,7 @@ public class ExpressionBuilder {
                 if (null != conditionalExpressionContext.COLON() && null != conditionalExpressionContext.conditionalExpression()) {
                     rhs = processConditionalExpression(conditionalExpressionContext.conditionalExpression());
                 }
-                Expression resultExpression = new ArithmeticExpression(null, lhs, rhs);
+                Expression resultExpression = new ArithmeticExpression(ArithmeticOperator.TERNARY, lhs, rhs);
                 resultExpression.setPreExpression(preExpression);
                 return resultExpression;
             } else {
@@ -294,17 +294,29 @@ public class ExpressionBuilder {
                 return new ArithmeticExpression(ArithmeticOperator.LOOPADDITION, scheme.searchVariableExpression(variableName),null);
             }else if(null != iterativeAggregationExpressionContext.expression()){
                 BenefitParser.ExpressionContext expressionContext =iterativeAggregationExpressionContext.expression();
-                TerminalNode LHS_IDENTIFIER = expressionContext.conditionalExpression().conditionalOrExpression().conditionalAndExpression(0).relationalExpression(0).additiveExpression(0).multiplicativeExpression(0).unaryExpression(0).primary().variableName().IDENTIFIER();
-                if( null != LHS_IDENTIFIER){
-                    //String lhsVariableName = LHS_IDENTIFIER.getText();
-                   TerminalNode RHS_IDENTIFIER = expressionContext.conditionalExpression().conditionalOrExpression().conditionalAndExpression(0).relationalExpression(0).additiveExpression(0).iterativeAggregationExpression().variableDeclarationStatement().variableDeclaratorId().variableName().IDENTIFIER();
-                   if(null != RHS_IDENTIFIER){
-                       String rhsVariableName = RHS_IDENTIFIER.getText();
-                        Expression rhsVariableExpression = scheme.searchVariableExpression(rhsVariableName);
-                      return new ArithmeticExpression(ArithmeticOperator.LOOPADDITION,rhsVariableExpression,null);
-                   }
+                BenefitParser.PrimaryContext lhsPrimaryContext = expressionContext.conditionalExpression().conditionalOrExpression().conditionalAndExpression(0).relationalExpression(0).additiveExpression(0).multiplicativeExpression(0).unaryExpression(0).primary();
+                if(lhsPrimaryContext.variableName() != null) {
+                    TerminalNode LHS_IDENTIFIER = lhsPrimaryContext.variableName().IDENTIFIER();
+                    if (null != LHS_IDENTIFIER) {
+                        //String lhsVariableName = LHS_IDENTIFIER.getText();
+                        TerminalNode RHS_IDENTIFIER = expressionContext.conditionalExpression().conditionalOrExpression().conditionalAndExpression(0).relationalExpression(0).additiveExpression(0).iterativeAggregationExpression().variableDeclarationStatement().variableDeclaratorId().variableName().IDENTIFIER();
+                        if (null != RHS_IDENTIFIER) {
+                            String rhsVariableName = RHS_IDENTIFIER.getText();
+                            Expression rhsVariableExpression = scheme.searchVariableExpression(rhsVariableName);
+                            return new ArithmeticExpression(ArithmeticOperator.LOOPADDITION, rhsVariableExpression, null);
+                        }
+                    }
+                }else if(lhsPrimaryContext.parExpression() != null){
+                    return processParExpression(lhsPrimaryContext.parExpression());
                 }
             }
+        }
+        return null;
+    }
+
+    private Expression processParExpression(BenefitParser.ParExpressionContext parExpressionContext){
+        if(null != parExpressionContext.LPAREN() && null != parExpressionContext.RPAREN() && null !=parExpressionContext.expression() ){
+            return processExpression(parExpressionContext.expression());
         }
         return null;
     }
@@ -377,6 +389,8 @@ public class ExpressionBuilder {
                 //scheme.getComputeUnit().addExpression(variableExpression);
                 return  variableExpression;
             }
+        }else if( null != unaryExpressionContext.primary().parExpression()){
+            return processParExpression(unaryExpressionContext.primary().parExpression());
         }
         return null;
     }

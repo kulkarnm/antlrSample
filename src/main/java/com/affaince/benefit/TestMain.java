@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,20 @@ public class TestMain {
     }
 
     public static void execute() {
+
+        String str5 = " given \n" +
+                "\t VALUE_PER_POINT = 10	;\n" +
+        "\t NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS as input ;\n" +
+        "\t NUMBER_OF_RENEWALS as input ;\n" +
+        "\t compute \n" +
+        "\t         BENEFIT_COUNT = NUMBER_OF_RENEWALS / (NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS > 0 ? NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS : 1) ;\n" +
+        "\t BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT	;\n" +
+        "\t eligibleWhen \n" +
+        "\t NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS < 3	;\n" +
+        "\t pay BENEFIT_VALUE \n" +
+        "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion;\n" ;
+
+/*
         String str4 = " given \n" +
         "\t VALUE_PER_POINT = 10 ;\n" +
         "\t PRODUCT_SUBSCRIPTION_COUNT_PER_SUBSCRIPTION[] as input ;\n" +
@@ -34,6 +49,7 @@ public class TestMain {
         "\t \n" +
         "\t pay BENEFIT_VALUE \n" +
         "\t after 1/4, 1/2, 3/4  of TOTAL_DELIVERIES in default proportion ;" ;
+*/
 
 
  /*       String str3 = "given \n" +
@@ -86,7 +102,7 @@ public class TestMain {
 */
 
         //DummyEvent1 dummyEvent1 = new DummyEvent1(25000, 12, 12);
-        List<Integer> list= new ArrayList<>();
+ /*       List<Integer> list= new ArrayList<>();
         list.add(8);
         list.add(8);
         list.add(8);
@@ -94,13 +110,16 @@ public class TestMain {
         list.add(8);
         //DummyEvent2 dummyEvent2 = new DummyEvent2(5,list,12);
         //DummyEvent3 dummyEvent3 = new DummyEvent3(5,list,12) ;
-        DummyEvent4 dummyEvent4 = new DummyEvent4(list,"Product1",10);
+        DummyEvent4 dummyEvent4 = new DummyEvent4(list,"Product1",10);*/
+
+        Integer numberOfRenewals = 3;
+        Integer numberOfModificationsAllSubscriptions = 0;
         DummyEventProcessor dummyEventProcessor = new DummyEventProcessor();
         Scheme scheme = new Scheme();
-        scheme = dummyEventProcessor.processDummyEvent(scheme, dummyEvent4);
+        scheme = dummyEventProcessor.processDummyEvent(scheme, new DummyEvent5(numberOfRenewals,numberOfModificationsAllSubscriptions,12));
 
 
-        BenefitLexer lexer = new BenefitLexer(CharStreams.fromString(str4));
+        BenefitLexer lexer = new BenefitLexer(CharStreams.fromString(str5));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         BenefitParser parser = new BenefitParser(tokens);
         ParseTree tree = parser.scheme();
