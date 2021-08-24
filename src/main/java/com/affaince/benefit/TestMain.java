@@ -3,6 +3,7 @@ package com.affaince.benefit;
 import com.affaince.benefit.dummy.*;
 import com.affaince.benefit.processors.BenefitSchemeListener;
 import com.affaince.benefit.processors.SchemeExecutor;
+import com.affaince.benefit.processors.SchemeRegistrationProcessor;
 import com.affaince.benefit.scheme.BenefitSchemeContext;
 import com.affaince.benefit.scheme.Scheme;
 import com.affaince.benefit.serde.SchemeDeserializer;
@@ -26,13 +27,14 @@ public class TestMain {
                 "\t VALUE_PER_POINT = 10	;\n" +
         "\t NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS as input ;\n" +
         "\t NUMBER_OF_RENEWALS as input ;\n" +
+        "\t TOTAL_DELIVERIES as input ;\n" +
         "\t compute \n" +
         "\t         BENEFIT_COUNT = NUMBER_OF_RENEWALS / (NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS > 0 ? NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS : 1) ;\n" +
         "\t BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT	;\n" +
         "\t eligibleWhen \n" +
         "\t NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS < 3	;\n" +
         "\t pay BENEFIT_VALUE \n" +
-        "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion;\n" ;
+        "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;\n" ;
 
 /*
         String str4 = " given \n" +
@@ -112,26 +114,13 @@ public class TestMain {
         //DummyEvent3 dummyEvent3 = new DummyEvent3(5,list,12) ;
         DummyEvent4 dummyEvent4 = new DummyEvent4(list,"Product1",10);*/
 
+
+
+        Scheme scheme = new SchemeRegistrationProcessor().registerScheme(str5);
+
         Integer numberOfRenewals = 3;
         Integer numberOfModificationsAllSubscriptions = 0;
-        DummyEventProcessor dummyEventProcessor = new DummyEventProcessor();
-        Scheme scheme = new Scheme();
-        scheme = dummyEventProcessor.processDummyEvent(scheme, new DummyEvent5(numberOfRenewals,numberOfModificationsAllSubscriptions,12));
-
-
-        BenefitLexer lexer = new BenefitLexer(CharStreams.fromString(str5));
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        BenefitParser parser = new BenefitParser(tokens);
-        ParseTree tree = parser.scheme();
-        ParseTreeWalker walker = new ParseTreeWalker();
-
-        BenefitSchemeListener listener = new BenefitSchemeListener(scheme);
-        walker.walk(listener, tree);
-        scheme = listener.getScheme();
-
-/*        SchemeExecutor schemeExecutor = new SchemeExecutor();
-        BenefitSchemeContext benefitSchemeContext = schemeExecutor.executeScheme(scheme);
-        print(benefitSchemeContext);*/
+        ExpressionLoaderProcessor expressionLoaderProcessor = new ExpressionLoaderProcessor();
 
         SchemeSerializer serializer = new SchemeSerializer();
         String schemeString = serializer.serialize(scheme);
@@ -139,6 +128,8 @@ public class TestMain {
         System.out.println(schemeString);
         SchemeDeserializer deserializer = new SchemeDeserializer();
         Scheme scheme2 = deserializer.deserialize(schemeString);
+
+        scheme2 = expressionLoaderProcessor.convertToInputExpressions(scheme2, new DummyEvent5(numberOfRenewals,numberOfModificationsAllSubscriptions,12));
 
         SchemeExecutor schemeExecutor = new SchemeExecutor();
         BenefitSchemeContext benefitSchemeContext2 = schemeExecutor.executeScheme(scheme2);

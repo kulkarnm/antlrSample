@@ -243,7 +243,12 @@ public class ExpressionBuilder {
                     if (null != variableDeclarationStatementContext.ASSIGN()) {   //assignment statement
                         return buildArrayVariable(variableName, variableInitializerContext);
                     } else if (null != variableDeclarationStatementContext.ASINPUT()) {
-                        return scheme.searchVariableExpression(variableName);
+                        Expression expression =  scheme.searchVariableExpression(variableName);
+                        if(null !=expression){
+                            return expression;
+                        }else {
+                            return new VariableExpression(new VariableIdentifierExpression(variableName),null);
+                        }
                     }
                 } else {
                     if (null != variableDeclarationStatementContext.ASSIGN()) {   //assignment statement
@@ -252,7 +257,12 @@ public class ExpressionBuilder {
                         //Put InputValuePlaceHolder here as at the time of parsing the tree the variable value in absent
                         //UnaryExpression value = new UnaryExpression(new InputValuePlaceHolder(variableName));
                         //return new VariableExpression(new UnaryExpression(variableName),value);
-                        return scheme.searchVariableExpression(variableName);
+                        Expression expression =  scheme.searchVariableExpression(variableName);
+                        if(null !=expression){
+                            return expression;
+                        }else {
+                            return new VariableExpression(new VariableIdentifierExpression(variableName),null);
+                        }
                     }
                 }
             }

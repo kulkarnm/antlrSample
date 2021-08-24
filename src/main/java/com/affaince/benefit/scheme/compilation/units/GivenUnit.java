@@ -5,14 +5,17 @@ import com.affaince.benefit.scheme.expressions.Expression;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @JsonIdentityInfo(generator= ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class GivenUnit {
-    private LinkedList<Expression> expressionQueue;
+    private List<Expression> expressionQueue;
 
     public GivenUnit() {
-        this.expressionQueue = new LinkedList<>();
+        this.expressionQueue = new ArrayList<>();
     }
 
     public void addExpression(Expression expression){
@@ -20,10 +23,12 @@ public class GivenUnit {
         boolean isAlreadyExist = expressionQueue.stream().anyMatch(exp->exp.getLeftHandSide().apply().toString().equals(variableName)) ;
         if(! isAlreadyExist) {
             this.expressionQueue.add(expression);
+        }else{
+            expressionQueue = expressionQueue.stream().map(exp->exp.getLeftHandSide().apply().toString().equals(variableName) ? expression : exp).collect(Collectors.toList());
         }
     }
 
-    public LinkedList<Expression> getExpressionQueue() {
+    public List<Expression> getExpressionQueue() {
         return expressionQueue;
     }
 

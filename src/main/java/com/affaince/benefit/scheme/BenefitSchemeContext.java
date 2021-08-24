@@ -18,6 +18,9 @@ public class BenefitSchemeContext {
     public void addToInputVariables(String variableName,Object value){
         this.benefitInputContext.addToInputVariables(variableName,value);
     }
+    public void addToComputeVariables(String variableName,Object value){
+        this.benefitInputContext.addToComputedVariables(variableName,value);
+    }
     public void setEligibleForScheme(boolean isEligible){
         this.benefitOutputContext.setEligibleForScheme(isEligible);
     }
@@ -46,8 +49,10 @@ public class BenefitSchemeContext {
     }
     public class BenefitInputContext{
         private Map<String,Object> inputVariables;
+        private Map<String,Object> computedVariables;
         BenefitInputContext(){
             inputVariables = new HashMap<>();
+            computedVariables = new HashMap<>();
         }
 
         public Map<String, Object> getInputVariables() {
@@ -60,8 +65,15 @@ public class BenefitSchemeContext {
         public void addToInputVariables(String variableName,Object value){
             inputVariables.put(variableName,value);
         }
+        public void addToComputedVariables(String variableName,Object value) {
+            computedVariables.put(variableName,value);
+        }
         public Object searchVariableValue(String variableName){
-            return inputVariables.entrySet().stream().filter(var->var.getKey().equals(variableName)).findAny().get().getValue();
+            Object value =  inputVariables.entrySet().stream().filter(var->var.getKey().equals(variableName)).findAny().get().getValue();
+            if( null == value){
+                value =  computedVariables.entrySet().stream().filter(var->var.getKey().equals(variableName)).findAny().get().getValue();
+            }
+            return value;
         }
     }
     public class BenefitOutputContext{

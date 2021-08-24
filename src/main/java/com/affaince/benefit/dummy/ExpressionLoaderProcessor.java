@@ -9,11 +9,10 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-public class DummyEventProcessor {
+public class ExpressionLoaderProcessor {
 
-    public Scheme processDummyEvent(Scheme scheme, Object dummyEvent2){
+    public Scheme convertToInputExpressions(Scheme scheme, Object dummyEvent2){
         try {
-
             List<Field> eventFields = Arrays.asList(dummyEvent2.getClass().getDeclaredFields());
             for (Field eventField : eventFields) {
                 eventField.setAccessible(true);
@@ -26,6 +25,9 @@ public class DummyEventProcessor {
                 Object value = eventField.get(dummyEvent2);
                 VariableExpression variableExpression = new VariableExpression(new VariableIdentifierExpression(str),new UnaryExpression(value,UnaryExpression.obtainUnaryType(type)));
                 scheme.getGivenUnit().addExpression(variableExpression);
+                scheme.getEligibilityUnit().updateExpression(variableExpression);
+                scheme.getComputeUnit().updateExpression(variableExpression);
+                //scheme.getPayUnit().updateExpression(variableExpression);
             }
         }catch(IllegalAccessException ex){
             ex.printStackTrace();
