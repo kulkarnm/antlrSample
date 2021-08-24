@@ -1,6 +1,7 @@
 package com.affaince.benefit.scheme.compilation.units;
 
 import com.affaince.benefit.scheme.BenefitSchemeContext;
+import com.affaince.benefit.scheme.Scheme;
 import com.affaince.benefit.scheme.expressions.Expression;
 import com.affaince.benefit.scheme.expressions.PaymentExpression;
 import com.affaince.benefit.scheme.expressions.PaymentPrecedence;
@@ -43,8 +44,8 @@ public class PayUnit {
          }
     }
 
-    public void syncAllVariableReferences(GivenUnit givenUnit,ComputeUnit computeUnit){
-        this.paymentExpression.syncAllVariableReferences(givenUnit,computeUnit);
+    public void syncAllVariableReferences(Scheme scheme){
+        this.paymentExpression.syncAllVariableReferences(scheme);
     }
 
 

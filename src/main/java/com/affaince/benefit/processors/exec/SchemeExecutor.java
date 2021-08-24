@@ -1,4 +1,4 @@
-package com.affaince.benefit.processors;
+package com.affaince.benefit.processors.exec;
 
 import com.affaince.benefit.scheme.BenefitSchemeContext;
 import com.affaince.benefit.scheme.Scheme;
@@ -16,7 +16,7 @@ public class SchemeExecutor {
         System.out.println("eligibility :" + benefitSchemeContext.getEligibleForScheme());
         if(benefitSchemeContext.getEligibleForScheme()){
             scheme.getComputeUnit().execute(benefitSchemeContext);
-            scheme.getPayUnit().syncAllVariableReferences(scheme.getGivenUnit(), scheme.getComputeUnit());
+            scheme.getPayUnit().syncAllVariableReferences(scheme);
             scheme.getPayUnit().execute(benefitSchemeContext);
         }
         return this.benefitSchemeContext;

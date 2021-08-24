@@ -7,9 +7,16 @@ import com.affaince.benefit.scheme.compilation.units.PayUnit;
 import com.affaince.benefit.scheme.expressions.Expression;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import org.joda.time.LocalDate;
+
+import java.util.UUID;
 
 @JsonIdentityInfo(generator= ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class Scheme {
+    private String schemeId;
+    private LocalDate startDate;
+    private LocalDate endDate;
+
     private GivenUnit givenUnit;
     private ComputeUnit computeUnit;
     private EligibilityUnit eligibilityUnit;
@@ -17,6 +24,10 @@ public class Scheme {
     private CommonInputContext commonInputContext;
 
     public Scheme() {
+        schemeId = UUID.randomUUID().toString();
+        this.startDate = LocalDate.now();
+        this.endDate = new LocalDate(9999,12,31);
+
         givenUnit = new GivenUnit();
         computeUnit = new ComputeUnit();
         eligibilityUnit= new EligibilityUnit();
@@ -31,11 +42,6 @@ public class Scheme {
             expression = this.getComputeUnit().searchVariableExpression(variableName);
             if(null != expression){
                 return expression;
-            }else{
-                expression = this.getPayUnit().searchVariableExpression(variableName);
-                if(null != expression) {
-                    return expression;
-                }
             }
         }
         return null;

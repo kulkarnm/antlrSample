@@ -1,11 +1,7 @@
 package com.affaince.benefit.scheme.expressions;
 
-import com.affaince.benefit.scheme.compilation.units.ComputeUnit;
-import com.affaince.benefit.scheme.compilation.units.GivenUnit;
+import com.affaince.benefit.scheme.Scheme;
 import com.affaince.benefit.scheme.vo.VestingDistribution;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.util.*;
 public class PaymentExpression {
@@ -20,50 +16,37 @@ public class PaymentExpression {
         vestingDistributions = new ArrayList<>();
     }
 
-    public void syncAllVariableReferences(GivenUnit givenUnit, ComputeUnit computeUnit) {
+    public void syncAllVariableReferences(Scheme scheme) {
         //payableVariable
-        Expression valuedVariableExpression = searchVariableExpressionByName((String)payableVariable.getLeftHandSide().apply(),givenUnit,computeUnit);
+        Expression valuedVariableExpression = scheme.searchVariableExpression((String)payableVariable.getLeftHandSide().apply());
         if(null != valuedVariableExpression) {
             payableVariable.setRightHandSide(valuedVariableExpression.getRightHandSide());
         }
-        valuedVariableExpression = searchVariableExpressionByName((String)multiplierVariable.getLeftHandSide().apply(),givenUnit,computeUnit);
+        valuedVariableExpression = scheme.searchVariableExpression((String)multiplierVariable.getLeftHandSide().apply());
         if(null != valuedVariableExpression) {
             multiplierVariable.setRightHandSide(valuedVariableExpression.getRightHandSide());
         }
         for(Expression vestingPeriodicityExpression : vestingPeriodicityExpressions){
-            valuedVariableExpression = searchVariableExpressionByName((String)vestingPeriodicityExpression.getRightHandSide().getLeftHandSide().apply(),givenUnit,computeUnit);
+            valuedVariableExpression = scheme.searchVariableExpression((String)vestingPeriodicityExpression.getRightHandSide().getLeftHandSide().apply());
             if(null != valuedVariableExpression){
                 vestingPeriodicityExpression.getRightHandSide().setRightHandSide(valuedVariableExpression.getRightHandSide());
             }
         }
         for(VestingDistribution vestingDistributionExpressionEntry : vestingDistributions){
             Expression vestingPeriodicityExpression = vestingDistributionExpressionEntry.getKey();
-            valuedVariableExpression = searchVariableExpressionByName((String)vestingPeriodicityExpression.getRightHandSide().getLeftHandSide().apply(),givenUnit,computeUnit);
+            valuedVariableExpression = scheme.searchVariableExpression((String)vestingPeriodicityExpression.getRightHandSide().getLeftHandSide().apply());
             if(null != valuedVariableExpression){
                 vestingPeriodicityExpression.getRightHandSide().setRightHandSide(valuedVariableExpression.getRightHandSide());
             }
             Expression arithmeticExpression = vestingDistributionExpressionEntry.getValue();
             Expression payVariableExpression = arithmeticExpression.getRightHandSide();
-            valuedVariableExpression = searchVariableExpressionByName((String)payVariableExpression.getLeftHandSide().apply(),givenUnit,computeUnit);
+            valuedVariableExpression = scheme.searchVariableExpression((String)payVariableExpression.getLeftHandSide().apply());
             if(null != valuedVariableExpression){
                 payVariableExpression.getLeftHandSide().setRightHandSide(valuedVariableExpression.getRightHandSide());
             }
         }
     }
 
-    public Expression searchVariableExpressionByName(String variableName, GivenUnit givenUnit,ComputeUnit computeUnit) {
-        Expression foundVariable = null;
-        foundVariable = givenUnit.searchVariableExpression(variableName);
-        if( null != foundVariable){
-            return  foundVariable ;
-        }else{
-            foundVariable = computeUnit.searchVariableExpression(variableName);
-            if(null != foundVariable){
-                return  foundVariable;
-            }
-        }
-        return  null;
-    }
     public Expression searchVariableExpression(String variableName) {
         String payableVariableName = (String)payableVariable.apply();
         if(variableName.equals(payableVariableName)){

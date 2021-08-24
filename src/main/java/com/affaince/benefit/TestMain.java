@@ -1,18 +1,15 @@
 package com.affaince.benefit;
 
 import com.affaince.benefit.dummy.*;
-import com.affaince.benefit.processors.BenefitSchemeListener;
-import com.affaince.benefit.processors.SchemeExecutor;
-import com.affaince.benefit.processors.SchemeRegistrationProcessor;
+import com.affaince.benefit.processors.exec.ExpressionLoaderProcessor;
+import com.affaince.benefit.processors.exec.SchemeExecutor;
+import com.affaince.benefit.processors.reg.SchemeRegistrationProcessor;
 import com.affaince.benefit.scheme.BenefitSchemeContext;
 import com.affaince.benefit.scheme.Scheme;
 import com.affaince.benefit.serde.SchemeDeserializer;
 import com.affaince.benefit.serde.SchemeSerializer;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +20,7 @@ public class TestMain {
 
     public static void execute() {
 
-        String str5 = " given \n" +
+ /*       String str5 = " given \n" +
                 "\t VALUE_PER_POINT = 10	;\n" +
         "\t NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS as input ;\n" +
         "\t NUMBER_OF_RENEWALS as input ;\n" +
@@ -34,7 +31,7 @@ public class TestMain {
         "\t eligibleWhen \n" +
         "\t NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS < 3	;\n" +
         "\t pay BENEFIT_VALUE \n" +
-        "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;\n" ;
+        "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;\n" ;*/
 
 /*
         String str4 = " given \n" +
@@ -54,10 +51,11 @@ public class TestMain {
 */
 
 
- /*       String str3 = "given \n" +
+        String str3 = "given \n" +
         "\t VALUE_PER_POINT = 100 ;\n" +
         "\t SUBSCRIPTION_RENEWAL_COUNT as input ;\n" +
         "\t SUBSCRIPTION_PERIOD[] as input ;\n" +
+        "\t TOTAL_DELIVERIES as input ;\n" +
         "\t compute \n" +
         "\t         BENEFIT_COUNT = SUBSCRIPTION_RENEWAL_COUNT ;\n" +
         "\t BENEFIT_VALUE = SUBSCRIPTION_RENEWAL_COUNT * VALUE_PER_POINT ;\n" +
@@ -65,7 +63,7 @@ public class TestMain {
         "\t SUBSCRIPTION_RENEWAL_COUNT > 3 and \n" +
         "\t each SUBSCRIPTION_PERIOD >= 8 ;\n" +
         "\t pay BENEFIT_VALUE \n" +
-        "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in 2:3:4 proportion ;";*/
+        "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in 2:3:4 proportion ;";
 
 
 /*        String str = "given \n" +
@@ -104,23 +102,20 @@ public class TestMain {
 */
 
         //DummyEvent1 dummyEvent1 = new DummyEvent1(25000, 12, 12);
- /*       List<Integer> list= new ArrayList<>();
+        List<Integer> list= new ArrayList<>();
         list.add(8);
-        list.add(8);
-        list.add(8);
+        list.add(7);
+        list.add(7);
         list.add(8);
         list.add(8);
         //DummyEvent2 dummyEvent2 = new DummyEvent2(5,list,12);
-        //DummyEvent3 dummyEvent3 = new DummyEvent3(5,list,12) ;
-        DummyEvent4 dummyEvent4 = new DummyEvent4(list,"Product1",10);*/
+        DummyEvent3 dummyEvent3 = new DummyEvent3(5,list,7) ;
+        //DummyEvent4 dummyEvent4 = new DummyEvent4(list,"Product1",10);*/
 
 
 
-        Scheme scheme = new SchemeRegistrationProcessor().registerScheme(str5);
+        Scheme scheme = new SchemeRegistrationProcessor().registerScheme(str3);
 
-        Integer numberOfRenewals = 3;
-        Integer numberOfModificationsAllSubscriptions = 0;
-        ExpressionLoaderProcessor expressionLoaderProcessor = new ExpressionLoaderProcessor();
 
         SchemeSerializer serializer = new SchemeSerializer();
         String schemeString = serializer.serialize(scheme);
@@ -129,7 +124,11 @@ public class TestMain {
         SchemeDeserializer deserializer = new SchemeDeserializer();
         Scheme scheme2 = deserializer.deserialize(schemeString);
 
-        scheme2 = expressionLoaderProcessor.convertToInputExpressions(scheme2, new DummyEvent5(numberOfRenewals,numberOfModificationsAllSubscriptions,12));
+        Integer numberOfRenewals = 3;
+        Integer numberOfModificationsAllSubscriptions = 0;
+        ExpressionLoaderProcessor expressionLoaderProcessor = new ExpressionLoaderProcessor();
+
+        scheme2 = expressionLoaderProcessor.convertToInputExpressions(scheme2, dummyEvent3/*new DummyEvent5(numberOfRenewals,numberOfModificationsAllSubscriptions,12)*/);
 
         SchemeExecutor schemeExecutor = new SchemeExecutor();
         BenefitSchemeContext benefitSchemeContext2 = schemeExecutor.executeScheme(scheme2);

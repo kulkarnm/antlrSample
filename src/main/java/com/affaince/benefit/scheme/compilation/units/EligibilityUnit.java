@@ -2,6 +2,7 @@ package com.affaince.benefit.scheme.compilation.units;
 
 import com.affaince.benefit.scheme.BenefitSchemeContext;
 import com.affaince.benefit.scheme.expressions.Expression;
+import com.affaince.benefit.scheme.expressions.UnaryExpression;
 import com.affaince.benefit.scheme.expressions.VariableExpression;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -31,6 +32,13 @@ public class EligibilityUnit {
             for(Object rhsObj : rhs){
                 if( rhsObj instanceof Expression){
                    updateVariablesUsedInUnit((Expression)rhsObj,updatedExpression);
+                }
+            }
+        }else if (null != sourceExpression && sourceExpression instanceof UnaryExpression){
+            Object value = ((UnaryExpression) sourceExpression).getValue();
+            if(value instanceof List<?>){
+                for(Expression embeddedExp : (List<Expression>)value){
+                    updateVariablesUsedInUnit(embeddedExp,updatedExpression);
                 }
             }
         }else {
