@@ -23,7 +23,9 @@ public class GivenUnit {
         if(! isAlreadyExist) {
             this.expressionQueue.add(expression);
         }else{
-            expressionQueue = expressionQueue.stream().map(exp->exp.getLeftHandSide().apply().toString().equals(variableName) ? expression : exp).collect(Collectors.toList());
+            expressionQueue = expressionQueue.stream().
+                    map(exp->exp.getLeftHandSide().apply().toString().equals(variableName) ? expression : exp).
+                    collect(Collectors.toList());
         }
     }
 

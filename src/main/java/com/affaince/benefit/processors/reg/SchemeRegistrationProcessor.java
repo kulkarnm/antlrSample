@@ -2,7 +2,6 @@ package com.affaince.benefit.processors.reg;
 
 import com.affaince.benefit.BenefitLexer;
 import com.affaince.benefit.BenefitParser;
-import com.affaince.benefit.processors.reg.BenefitSchemeListener;
 import com.affaince.benefit.scheme.Scheme;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

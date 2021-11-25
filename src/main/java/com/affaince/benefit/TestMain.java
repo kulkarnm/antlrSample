@@ -1,5 +1,7 @@
 package com.affaince.benefit;
 
+import com.affaince.benefit.compiler.BenefitsCompiler;
+import com.affaince.benefit.context.MetricsContext;
 import com.affaince.benefit.dummy.*;
 import com.affaince.benefit.processors.exec.ExpressionLoaderProcessor;
 import com.affaince.benefit.processors.exec.SchemeExecutor;
@@ -101,37 +103,19 @@ public class TestMain {
                 "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;";
 */
 
-        //DummyEvent1 dummyEvent1 = new DummyEvent1(25000, 12, 12);
+
         List<Integer> list= new ArrayList<>();
         list.add(8);
-        list.add(7);
-        list.add(7);
-        list.add(8);
-        list.add(8);
-        //DummyEvent2 dummyEvent2 = new DummyEvent2(5,list,12);
-        DummyEvent3 dummyEvent3 = new DummyEvent3(5,list,7) ;
-        //DummyEvent4 dummyEvent4 = new DummyEvent4(list,"Product1",10);*/
+        list.add(9);
+        list.add(10);
+        list.add(11);
+        list.add(12);
 
-
-
-        Scheme scheme = new SchemeRegistrationProcessor().registerScheme(str3);
-
-
-        SchemeSerializer serializer = new SchemeSerializer();
-        String schemeString = serializer.serialize(scheme);
-
-        System.out.println(schemeString);
-        SchemeDeserializer deserializer = new SchemeDeserializer();
-        Scheme scheme2 = deserializer.deserialize(schemeString);
-
-        Integer numberOfRenewals = 3;
-        Integer numberOfModificationsAllSubscriptions = 0;
-        ExpressionLoaderProcessor expressionLoaderProcessor = new ExpressionLoaderProcessor();
-
-        scheme2 = expressionLoaderProcessor.convertToInputExpressions(scheme2, dummyEvent3/*new DummyEvent5(numberOfRenewals,numberOfModificationsAllSubscriptions,12)*/);
-
-        SchemeExecutor schemeExecutor = new SchemeExecutor();
-        BenefitSchemeContext benefitSchemeContext2 = schemeExecutor.executeScheme(scheme2);
+        MetricsContext context= new MetricsContext();
+        context.addToSubscriberMetrics("SUBSCRIPTION_RENEWAL_COUNT",5);
+        context.addToSubscriberMetrics("SUBSCRIPTION_PERIOD",list);
+        context.addToSubscriberMetrics("TOTAL_DELIVERIES",12);
+        BenefitSchemeContext benefitSchemeContext2 = new BenefitsCompiler().compile(str3,context);
         print(benefitSchemeContext2);
 
 

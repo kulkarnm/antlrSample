@@ -2,7 +2,6 @@ package com.affaince.benefit.scheme.expressions;
 
 import com.fasterxml.jackson.annotation.*;
 
-import java.lang.reflect.ParameterizedType;
 @JsonIdentityInfo(generator= ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,

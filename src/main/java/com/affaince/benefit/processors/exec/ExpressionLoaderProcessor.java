@@ -1,6 +1,9 @@
 package com.affaince.benefit.processors.exec;
 
+import com.affaince.benefit.context.MetricsContext;
 import com.affaince.benefit.scheme.*;
+import com.affaince.benefit.scheme.compilation.units.GivenUnit;
+import com.affaince.benefit.scheme.expressions.Expression;
 import com.affaince.benefit.scheme.expressions.UnaryExpression;
 import com.affaince.benefit.scheme.expressions.VariableExpression;
 import com.affaince.benefit.scheme.expressions.VariableIdentifierExpression;
@@ -35,4 +38,19 @@ public class ExpressionLoaderProcessor {
         return scheme;
     }
 
+
+    public Scheme supplyVariableValues(Scheme scheme, MetricsContext metricsContext){
+        List<Expression> queue = scheme.getGivenUnit().getExpressionQueue();
+        for(Expression expression: queue){
+            String variableName=(String)expression.getLeftHandSide().apply();
+            Object value = metricsContext.findValue(variableName);
+            if(null != value) {
+                VariableExpression variableExpression = new VariableExpression(new VariableIdentifierExpression(variableName), new UnaryExpression(value, UnaryExpression.obtainUnaryType(Object.class)));
+                scheme.getGivenUnit().addExpression(variableExpression);
+                scheme.getEligibilityUnit().updateExpression(variableExpression);
+                scheme.getComputeUnit().updateExpression(variableExpression);
+            }
+        }
+        return scheme;
+    }
 }
