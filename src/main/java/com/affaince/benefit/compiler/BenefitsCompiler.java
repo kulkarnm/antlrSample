@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BenefitsCompiler {
-    private Scheme parseSchemeString(String schemeDefinitionString) {
+    public Scheme parseSchemeString(String schemeDefinitionString) {
         BenefitLexer lexer = new BenefitLexer(CharStreams.fromString(schemeDefinitionString));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         BenefitParser parser = new BenefitParser(tokens);
@@ -30,6 +30,18 @@ public class BenefitsCompiler {
         scheme = listener.getScheme();  //plain parsed scheme without any inputs.. due for registration
         return scheme;
     }
+    public BenefitSchemeContext compile(Scheme scheme, MetricsContext metricsContext){
+        // SchemeDeserializer deserializer = new SchemeDeserializer();
+        //Scheme scheme = deserializer.deserialize(schemeString);
+        ExpressionLoaderProcessor expressionLoaderProcessor = new ExpressionLoaderProcessor();
+        scheme = expressionLoaderProcessor.supplyVariableValues(scheme, metricsContext);
+
+        SchemeExecutor schemeExecutor = new SchemeExecutor();
+        BenefitSchemeContext benefitSchemeContext = schemeExecutor.executeScheme(scheme);
+        print(benefitSchemeContext);
+        return benefitSchemeContext;
+    }
+
     public BenefitSchemeContext compile(String schemeString, MetricsContext metricsContext){
         // SchemeDeserializer deserializer = new SchemeDeserializer();
         //Scheme scheme = deserializer.deserialize(schemeString);

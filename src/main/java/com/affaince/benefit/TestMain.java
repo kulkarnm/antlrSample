@@ -2,14 +2,10 @@ package com.affaince.benefit;
 
 import com.affaince.benefit.compiler.BenefitsCompiler;
 import com.affaince.benefit.context.MetricsContext;
-import com.affaince.benefit.dummy.*;
-import com.affaince.benefit.processors.exec.ExpressionLoaderProcessor;
-import com.affaince.benefit.processors.exec.SchemeExecutor;
-import com.affaince.benefit.processors.reg.SchemeRegistrationProcessor;
 import com.affaince.benefit.scheme.BenefitSchemeContext;
 import com.affaince.benefit.scheme.Scheme;
-import com.affaince.benefit.serde.SchemeDeserializer;
-import com.affaince.benefit.serde.SchemeSerializer;
+import com.affaince.benefit.scheme.expressions.*;
+import com.affaince.vo.EligibilityExpressionOutput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,8 +99,23 @@ public class TestMain {
                 "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;";
 */
 
+        BenefitsCompiler compiler = new BenefitsCompiler();
+        Scheme scheme = compiler.parseSchemeString(str3);
 
-        List<Integer> list= new ArrayList<>();
+        Expression eligibilityExpression = scheme.getEligibilityUnit().getExpression();
+        //preExpression will never occur in case of eligibility expression
+        //Expression preExpression = eligibilityExpression.getPreExpression();
+        List<EligibilityExpressionOutput> outputs = processEligibilityExpression(eligibilityExpression);
+        for(EligibilityExpressionOutput output:outputs){
+            System.out.println("Name: " + output.getMetricName());
+            System.out.println("value : " + output.getValue());
+            System.out.println("type: " + output.getValueType());
+            System.out.println("operator:  " + output.getOperator());
+        }
+
+
+
+ /*       List<Integer> list= new ArrayList<>();
         list.add(8);
         list.add(9);
         list.add(10);
@@ -115,12 +126,33 @@ public class TestMain {
         context.addToSubscriberMetrics("SUBSCRIPTION_RENEWAL_COUNT",5);
         context.addToSubscriberMetrics("SUBSCRIPTION_PERIOD",list);
         context.addToSubscriberMetrics("TOTAL_DELIVERIES",12);
-        BenefitSchemeContext benefitSchemeContext2 = new BenefitsCompiler().compile(str3,context);
-        print(benefitSchemeContext2);
+        BenefitSchemeContext benefitSchemeContext2 = new BenefitsCompiler().compile(scheme,context);*/
+        //print(benefitSchemeContext2);
 
 
     }
 
+    public static List<EligibilityExpressionOutput> processEligibilityExpression(Expression eligibilityExpression){
+        Expression lhs = eligibilityExpression.getLeftHandSide();
+        Expression rhs= eligibilityExpression.getRightHandSide();
+        ArithmeticOperator operator = eligibilityExpression.getOperator();
+        List<EligibilityExpressionOutput> outputs = new ArrayList<>();
+        if(operator == ArithmeticOperator.AND) { // it means there are more than one expression, ignore RHS
+            List<ArithmeticComparisonExpression> value =(List<ArithmeticComparisonExpression>) ((UnaryExpression)lhs).getValue();
+            for(ArithmeticComparisonExpression comparisonExpression: value){
+                Expression lhsOfComparison = comparisonExpression.getLeftHandSide();
+                Expression rhsOfComparison = comparisonExpression.getRightHandSide();
+                ArithmeticOperator operatorOfComparison = comparisonExpression.getOperator();
+                //lhs is always going to be a string
+                String metricName = lhsOfComparison.getLeftHandSide().apply().toString();
+                Object rhsValue = rhsOfComparison.apply();
+                UnaryType valueType = ((UnaryExpression)rhsOfComparison).getType();
+                EligibilityExpressionOutput output = new EligibilityExpressionOutput(metricName,rhsValue,valueType,operatorOfComparison);
+                outputs.add(output);
+            }
+        }
+        return outputs;
+    }
     public static void print(BenefitSchemeContext benefitSchemeContext) {
         System.out.println("***********LETS GO THROUGH INPUT,COMPUTED AND OUTPUT VALUES**********");
         System.out.println("***********************INPUT VALUES**********************************");
