@@ -35,7 +35,6 @@ public class BenefitSchemeListener extends BenefitBaseListener {
        for(BenefitParser.BlockStatementContext blockStatementContext:blockStatementContexts){
            scheme.getComputeUnit().addExpression(expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression()));
        }
-        System.out.println("exit ComputeBlock");
     }
 
     @Override public void exitEligibilityUnit(BenefitParser.EligibilityUnitContext ctx) {
@@ -43,12 +42,10 @@ public class BenefitSchemeListener extends BenefitBaseListener {
         for(BenefitParser.BlockStatementContext blockStatementContext:blockStatementContexts){
             scheme.getEligibilityUnit().setExpression(expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression()));
         }
-        System.out.println("exit eligibility unit");
     }
 
     @Override public void exitPayUnit(BenefitParser.PayUnitContext ctx) {
        this.scheme.getPayUnit().setPaymentExpression(paymentExpressionBuilder.buildPaymentExpression(ctx));
-        System.out.println("exit payment unit");
     }
 
     public Scheme getScheme() {

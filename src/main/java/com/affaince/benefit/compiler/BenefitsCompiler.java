@@ -30,30 +30,30 @@ public class BenefitsCompiler {
         scheme = listener.getScheme();  //plain parsed scheme without any inputs.. due for registration
         return scheme;
     }
-    public BenefitSchemeContext compile(Scheme scheme, MetricsContext metricsContext){
+    public Scheme compile(Scheme scheme, MetricsContext metricsContext){
         // SchemeDeserializer deserializer = new SchemeDeserializer();
         //Scheme scheme = deserializer.deserialize(schemeString);
         ExpressionLoaderProcessor expressionLoaderProcessor = new ExpressionLoaderProcessor();
         scheme = expressionLoaderProcessor.supplyVariableValues(scheme, metricsContext);
+        return scheme;
+    }
 
+    public BenefitSchemeContext execute(Scheme scheme){
         SchemeExecutor schemeExecutor = new SchemeExecutor();
         BenefitSchemeContext benefitSchemeContext = schemeExecutor.executeScheme(scheme);
-        print(benefitSchemeContext);
+       // print(benefitSchemeContext);
         return benefitSchemeContext;
     }
 
-    public BenefitSchemeContext compile(String schemeString, MetricsContext metricsContext){
+    public Scheme compile(String schemeString, MetricsContext metricsContext){
         // SchemeDeserializer deserializer = new SchemeDeserializer();
         //Scheme scheme = deserializer.deserialize(schemeString);
         Scheme scheme = parseSchemeString(schemeString);
         ExpressionLoaderProcessor expressionLoaderProcessor = new ExpressionLoaderProcessor();
         scheme = expressionLoaderProcessor.supplyVariableValues(scheme, metricsContext);
-
-        SchemeExecutor schemeExecutor = new SchemeExecutor();
-        BenefitSchemeContext benefitSchemeContext = schemeExecutor.executeScheme(scheme);
-        print(benefitSchemeContext);
-        return benefitSchemeContext;
+        return scheme;
     }
+
     public static void print(BenefitSchemeContext benefitSchemeContext) {
         System.out.println("***********LETS GO THROUGH INPUT,COMPUTED AND OUTPUT VALUES**********");
         System.out.println("***********************INPUT VALUES**********************************");

@@ -1,17 +1,18 @@
 package com.affaince.benefit.scheme.compilation.units;
 
 import com.affaince.benefit.scheme.BenefitSchemeContext;
-import com.affaince.benefit.scheme.expressions.Expression;
-import com.affaince.benefit.scheme.expressions.UnaryExpression;
-import com.affaince.benefit.scheme.expressions.VariableExpression;
+import com.affaince.benefit.scheme.expressions.*;
+import com.affaince.vo.EligibilityExpressionOutput;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIdentityInfo(generator= ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class EligibilityUnit {
     private Expression expression;
+    private List<EligibilityExpressionOutput> eligibilityExpressionWiseOutputs;
 
     public EligibilityUnit() {
     }
@@ -64,7 +65,39 @@ public class EligibilityUnit {
     public void updateExpression(Expression updatedExpression){
         updateVariablesUsedInUnit(expression,updatedExpression);
     }
+    private List<EligibilityExpressionOutput> processEligibilityExpression() {
+        Expression lhs = this.expression.getLeftHandSide();
+        ArithmeticOperator operator = this.expression.getOperator();
+        List<EligibilityExpressionOutput> outputs = new ArrayList<>();
+        EligibilityExpressionOutput output=null;
+        if (operator == ArithmeticOperator.AND || operator == ArithmeticOperator.OR) { // it means there are more than one expression, ignore RHS
+            List<ArithmeticComparisonExpression> value = (List<ArithmeticComparisonExpression>) ((UnaryExpression) lhs).getValue();
+            for (ArithmeticComparisonExpression comparisonExpression : value) {
+                output = processSingleEligibilityExpression(comparisonExpression);
+                outputs.add(output);
+            }
+        } else{
+            output = processSingleEligibilityExpression(this.expression);
+            outputs.add(output);
+        }
+
+        return outputs;
+    }
+
+    private EligibilityExpressionOutput processSingleEligibilityExpression(Expression comparisonExpression) {
+        Expression lhsOfComparison = comparisonExpression.getLeftHandSide();
+        Expression rhsOfComparison = comparisonExpression.getRightHandSide();
+        ArithmeticOperator operatorOfComparison = comparisonExpression.getOperator();
+        //lhs is always going to be a string
+        String metricName = lhsOfComparison.getLeftHandSide().apply().toString();
+        Object rhsValue = rhsOfComparison.apply();
+        UnaryType valueType = ((UnaryExpression) rhsOfComparison).getType();
+        EligibilityExpressionOutput output = new EligibilityExpressionOutput(metricName, rhsValue, valueType, operatorOfComparison);
+        return output;
+    }
+
     public void execute(BenefitSchemeContext benefitSchemeContext){
+            this.eligibilityExpressionWiseOutputs = processEligibilityExpression();
             if((Boolean)expression.apply()){
                 benefitSchemeContext.setEligibleForScheme(true);
             }
@@ -72,5 +105,9 @@ public class EligibilityUnit {
 
     public Expression getExpression() {
         return expression;
+    }
+
+    public List<EligibilityExpressionOutput> getEligibilityExpressionWiseOutputs() {
+        return eligibilityExpressionWiseOutputs;
     }
 }

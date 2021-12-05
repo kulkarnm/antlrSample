@@ -7,6 +7,9 @@ public class VariableExpression extends Expression  {
     }
 
     public Object apply() {
-            return getRightHandSide().apply();
+            if(null != getRightHandSide()) {
+                return getRightHandSide().apply();
+            }
+            return null;
     }
 }

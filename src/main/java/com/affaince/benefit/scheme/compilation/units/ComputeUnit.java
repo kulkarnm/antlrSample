@@ -4,6 +4,7 @@ import com.affaince.benefit.scheme.BenefitSchemeContext;
 import com.affaince.benefit.scheme.expressions.Expression;
 import com.affaince.benefit.scheme.expressions.UnaryExpression;
 import com.affaince.benefit.scheme.expressions.VariableExpression;
+import com.affaince.vo.ComputeExpressionOutput;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @JsonIdentityInfo(generator= ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 public class ComputeUnit {
     private List<Expression> expressionQueue;
+    private List<ComputeExpressionOutput> computeExpressionOutputs;
 
     public ComputeUnit() {
         this.expressionQueue = new ArrayList<>();
@@ -66,6 +68,7 @@ public class ComputeUnit {
     }
 
     public void execute(BenefitSchemeContext benefitSchemeContext) {
+        List<ComputeExpressionOutput> computeExpressionOutputs = new ArrayList<>();
         for (Expression expression : expressionQueue) {
             String variableName = (String) expression.getLeftHandSide().getLeftHandSide().apply();
             Object variableValue = expression.getRightHandSide().apply();
@@ -74,7 +77,10 @@ public class ComputeUnit {
             updateAllVariableReferences(variableName,valueExpression);
             //benefitSchemeContext.addToInputVariables(variableName, variableValue);
             benefitSchemeContext.addToComputeVariables(variableName,variableValue);
+            ComputeExpressionOutput output = new ComputeExpressionOutput(variableName,variableValue,UnaryExpression.obtainUnaryType(variableValue.getClass()));
+            computeExpressionOutputs.add(output);
         }
+        this.computeExpressionOutputs=computeExpressionOutputs;
     }
 
     public void updateAllVariableReferences(String variableName, Expression expression) {
@@ -114,5 +120,9 @@ public class ComputeUnit {
             }
         }
         return null;
+    }
+
+    public List<ComputeExpressionOutput> getComputeExpressionOutputs() {
+        return computeExpressionOutputs;
     }
 }
