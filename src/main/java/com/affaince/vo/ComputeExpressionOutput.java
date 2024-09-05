@@ -1,7 +1,7 @@
 package com.affaince.vo;
 
-import com.affaince.benefit.scheme.expressions.ArithmeticOperator;
-import com.affaince.benefit.scheme.expressions.UnaryType;
+
+import com.affaince.benefits.scheme.expressions.UnaryType;
 
 public class ComputeExpressionOutput {
     private String metricName;
