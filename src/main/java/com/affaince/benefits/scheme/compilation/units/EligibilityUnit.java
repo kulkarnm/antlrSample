@@ -177,6 +177,12 @@ public class EligibilityUnit {
                     }
                     benefitSchemeContext.setEligibleForScheme(allOutputs.stream().reduce(Boolean::logicalAnd).orElse(false));
                 }
+            }else{
+                if (expression instanceof ArithmeticComparisonExpression) {
+                    expression = applyValuesToVariables(expression,benefitSchemeContext);
+                    boolean expressionOutput = (Boolean) expression.apply();
+                    benefitSchemeContext.setEligibleForScheme(expressionOutput);
+                }
             }
 
         }

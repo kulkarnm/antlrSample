@@ -31,7 +31,7 @@ public class TestMain {
     }
     public static String getScheme() {
 
- /*       String str = " given \n" +
+       String str = " given \n" +
                 "\t VALUE_PER_POINT = 10	;\n" +
         "\t NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS as input ;\n" +
         "\t NUMBER_OF_RENEWALS as input ;\n" +
@@ -40,9 +40,9 @@ public class TestMain {
         "\t         BENEFIT_COUNT = NUMBER_OF_RENEWALS / (NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS > 0 ? NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS : 1) ;\n" +
         "\t BENEFIT_VALUE = BENEFIT_COUNT * VALUE_PER_POINT	;\n" +
         "\t eligibleWhen \n" +
-        "\t NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS < 3	;\n" +
+        "\t NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS < 9	;\n" +
         "\t pay BENEFIT_VALUE \n" +
-        "\t after 1 / 4, 1 / 2, 3 / 4  of TOTAL_DELIVERIES in default proportion ;\n" ;*/
+        "\t after 1 / 4 of TOTAL_DELIVERIES, 1 / 2 of TOTAL_DELIVERIES, 3 / 4  of TOTAL_DELIVERIES in default proportion ;\n" ;
 
 /*
         String str = " given \n" +
@@ -62,6 +62,7 @@ public class TestMain {
 */
 
 
+/*
         String str = "given \n" +
                 "\t VALUE_PER_POINT = 100 ;\n" +
                 "\t SUBSCRIPTION_RENEWAL_COUNT as input ;\n" +
@@ -75,6 +76,7 @@ public class TestMain {
                 "\t each SUBSCRIPTION_PERIOD >= 8 ;\n" +
                 "\t pay BENEFIT_VALUE \n" +
                 "\t after 1 / 4 of TOTAL_DELIVERIES, 1 / 2 of TOTAL_DELIVERIES, 3 / 4  of TOTAL_DELIVERIES in 2:3:4 proportion ;";
+*/
 
 
 /*        String str = "given \n" +
@@ -115,7 +117,15 @@ public class TestMain {
     }
 
     public static BenefitsProcessingContext getInputs() {
+        //example 1 - no of modifications
+        BenefitsProcessingContext context = new BenefitsProcessingContext();
+        context.addToIntermediateVariables("NUMBER_OF_MODIFICATIONS_ALL_SUBSCRIPTIONS", 8);
+        context.addToIntermediateVariables("NUMBER_OF_RENEWALS", 4);
+        context.addToIntermediateVariables("TOTAL_DELIVERIES", 12);
+
         //Create input collection
+
+/*
         List<Integer> list = new ArrayList<>();
         list.add(8);
         list.add(7);
@@ -125,8 +135,12 @@ public class TestMain {
         context.addToIntermediateVariables("SUBSCRIPTION_RENEWAL_COUNT", 4);
         context.addToIntermediateVariables("SUBSCRIPTION_PERIOD", list);
         context.addToIntermediateVariables("TOTAL_DELIVERIES", 8);
+
+ */
         return context;
+
     }
+
 
 /*
         //Build scheme object form the scheme string

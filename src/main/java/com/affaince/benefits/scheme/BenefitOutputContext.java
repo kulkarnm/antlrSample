@@ -45,6 +45,9 @@ public class BenefitOutputContext {
     public void setBenefitVestingDistributionList(List<BenefitVestingDistribution> benefitVestingDistributionList) {
         this.benefitVestingDistributionList = benefitVestingDistributionList;
     }
+    public void addToBenefitValue(double benefitValue){
+        this.benefitValue=benefitValue;
+    }
     public void addToBenefitVestingDistributionList(double deliveryNumber,double benefitValueToBeVested){
         BenefitVestingDistribution benefitVestingDistribution= new BenefitVestingDistribution(deliveryNumber,benefitValueToBeVested);
         this.benefitVestingDistributionList.add(benefitVestingDistribution);

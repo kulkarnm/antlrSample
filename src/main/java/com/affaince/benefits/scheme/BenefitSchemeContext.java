@@ -22,6 +22,10 @@ public class BenefitSchemeContext {
     public void setEligibleForScheme(boolean isEligible){
         this.benefitOutputContext.setEligibleForScheme(isEligible);
     }
+    public void addToBenefitValue(double benefitValue){
+        this.benefitOutputContext.addToBenefitValue(benefitValue);
+    }
+
     public void addToBenefitVestingDistributionList(double deliveryNumber,double benefitValueToBeVested){
         this.benefitOutputContext.addToBenefitVestingDistributionList(deliveryNumber,benefitValueToBeVested);
     }

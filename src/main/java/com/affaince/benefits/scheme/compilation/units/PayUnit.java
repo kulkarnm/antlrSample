@@ -59,6 +59,7 @@ public class PayUnit {
             for (Expression expression : expressionQueue) {
                 ComputedVariableUnit computedVariable = computeIntermediateValues(expression, benefitSchemeContext);
                 benefitSchemeContext.addToComputedVariables((String) computedVariable.getVariableName(), (double) computedVariable.getVariableValue());
+                benefitSchemeContext.addToBenefitValue((double) computedVariable.getVariableValue());
             }
             PaymentPrecedence paymentPrecedence = paymentExpression.getPrecedence();
             if (paymentPrecedence == PaymentPrecedence.BEFORE) {
