@@ -3,6 +3,7 @@ package com.affaince.benefits.processors.reg;
 import com.affaince.benefits.grammar.BenefitBaseListener;
 import com.affaince.benefits.grammar.BenefitParser;
 import com.affaince.benefits.scheme.*;
+import com.affaince.benefits.scheme.expressions.Expression;
 
 import java.util.List;
 
@@ -36,7 +37,8 @@ public class BenefitSchemeListener extends BenefitBaseListener {
         List<BenefitParser.BlockStatementContext> blockStatementContexts =ctx.computeBlock().block().blockStatement();
         if(null != blockStatementContexts && !blockStatementContexts.isEmpty()) {
             for (BenefitParser.BlockStatementContext blockStatementContext : blockStatementContexts) {
-                scheme.getComputeUnit().addExpression(expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression()));
+                Expression computeUnitExpression = expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression());
+                scheme.getComputeUnit().addExpression(computeUnitExpression);
             }
         }
     }
@@ -45,7 +47,8 @@ public class BenefitSchemeListener extends BenefitBaseListener {
         List<BenefitParser.BlockStatementContext> blockStatementContexts =ctx.block().blockStatement();
         if(null != blockStatementContexts && !blockStatementContexts.isEmpty()) {
             for (BenefitParser.BlockStatementContext blockStatementContext : blockStatementContexts) {
-                scheme.getEligibilityUnit().setExpression(expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression()));
+                Expression eligibilityUnitExpression = expressionBuilder.buildExpression(blockStatementContext.statement().statementExpression().expression());
+                scheme.getEligibilityUnit().setExpression(eligibilityUnitExpression);
             }
         }
     }

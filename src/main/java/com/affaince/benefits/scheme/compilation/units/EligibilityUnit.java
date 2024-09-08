@@ -124,7 +124,7 @@ public class EligibilityUnit {
 */
 
     public Boolean processComparisonExpression(Expression compExpression, BenefitSchemeContext benefitSchemeContext) {
-        ArithmeticOperator operator=compExpression.getOperator();;
+        ArithmeticOperator operator=compExpression.getOperator();
         Expression lhs = compExpression.getLeftHandSide();
         if (operator == ArithmeticOperator.OR) {
             if (lhs instanceof UnaryExpression) {
