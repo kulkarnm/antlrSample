@@ -50,20 +50,7 @@ public class ExpressionBuilder {
             } else {
                 return lhs;
             }
-        } /*else {
-            if (null != conditionalExpressionContext.QUESTIONMARK() && null != conditionalExpressionContext.expression()) {
-                Expression lhs = processConditionalOrExpression(conditionalExpressionContext.conditionalOrExpression());
-                Expression preExpression = lhs;
-                lhs = processExpression(conditionalExpressionContext.expression());
-                if (null != conditionalExpressionContext.COLON() && null != conditionalExpressionContext.conditionalExpression()) {
-                    rhs = processConditionalExpression(conditionalExpressionContext.conditionalExpression());
-                }
-                Expression resultExpression = new ArithmeticExpression(ArithmeticOperator.TERNARY, lhs, rhs);
-                resultExpression.setPreExpression(preExpression);
-                return resultExpression;
-            }
-            return null;
-        }*/
+        }
         return null;
     }
 
@@ -311,52 +298,6 @@ public class ExpressionBuilder {
         }
         return null;
     }
-/*
-    private Expression processIterativeStatement(BenefitParser.IterativeStatementContext iterativeStatementContext) {
-        if (null != iterativeStatementContext.EACH()) {
-            if (null != iterativeStatementContext.expression()) {
-                //the only possibility here is the comparison of some variable/value with EACH element of the array
-                //hardcoded obtaining of relational context should suffice.
-                BenefitParser.RelationalExpressionContext lhsRelationalExpressionContext = iterativeStatementContext.expression().conditionalExpression().
-                        conditionalOrExpression().conditionalAndExpression().relationalExpression().relationalExpression();
-                List<BenefitParser.AdditiveExpressionContext> rhsAdditiveExpressionContexts = iterativeStatementContext.expression().conditionalExpression().
-                        conditionalOrExpression().conditionalAndExpression().relationalExpression().additiveExpression();
-
-                //LHS : in case of EACH lhs is always a variable who is an array;
-                BenefitParser.PrimaryContext lhsPrimaryContext = lhsRelationalExpressionContext.additiveExpression(0).multiplicativeExpression().unaryExpression().primary();
-                Expression lhsVariableExpression=null;
-                if(null != lhsPrimaryContext.variableName()) {
-                    String lhsCollectionVariableName = lhsPrimaryContext.variableName().getText();
-                    lhsVariableExpression = scheme.searchVariableExpression(lhsCollectionVariableName);
-                }else if(null != lhsPrimaryContext.literal()){
-
-                }
-
-                //RELATIONAL OP : in case of each only one relationalOp
-                BenefitParser.RelationalOpContext relationalOpContext = iterativeStatementContext.expression().conditionalExpression().
-                        conditionalOrExpression().conditionalAndExpression().relationalExpression().relationalOp(0);
-
-                //RHS: Single primary value or variable Name
-                BenefitParser.PrimaryContext rhsPrimaryContext = rhsAdditiveExpressionContexts.get(0).multiplicativeExpression().unaryExpression().primary();
-                if (null != rhsPrimaryContext.variableName()) {
-                    String rhsVariableName = lhsPrimaryContext.variableName().getText();
-                    Expression rhsVariableExpression = scheme.searchVariableExpression(rhsVariableName);
-                    return new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOpContext, true),
-                            lhsVariableExpression,
-                            rhsVariableExpression);
-                } else if (null != rhsPrimaryContext.literal()) {
-                    Integer value = Integer.parseInt(rhsPrimaryContext.literal().NUMBER().getText());
-                    UnaryExpression rhsUnaryExpression = new UnaryExpression(value, UnaryType.NUMBER);
-                    return new ArithmeticComparisonExpression(resolveOperatorForRelationalContext(relationalOpContext, true),
-                            lhsVariableExpression,
-                            rhsUnaryExpression);
-                }
-            }
-        }
-        return null;
-    }
-*/
-
 
     private Expression buildArrayVariable(String variableName, BenefitParser.VariableInitializerContext
             variableInitializerContext) {

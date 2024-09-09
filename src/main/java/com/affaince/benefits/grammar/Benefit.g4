@@ -56,8 +56,8 @@ payMultiplier
     :   OF
     ;
 variableDeclarationStatement
-    :   variableDeclaratorId
-    |   variableDeclaratorId ASSIGN variableInitializer SEMI
+    :   variableDeclaratorId SEMI
+    |   variableDeclaratorId ASSIGN variableInitializer SEMI?
     |   variableDeclaratorId ASINPUT SEMI
     ;
 variableDeclaratorId
